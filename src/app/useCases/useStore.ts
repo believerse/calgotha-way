@@ -24,7 +24,8 @@ export interface BlockIdHeaderPair {
   header: BlockHeader;
 }
 
-export interface Block extends BlockIdHeaderPair {
+export interface Block {
+  header: BlockHeader;
   transactions: Transaction[];
 }
 
@@ -40,25 +41,30 @@ export interface Transaction {
 
 interface FieldState {
   blocksById: { [blockId: string]: Block | null | undefined };
-  pushBlocks: (blocks?: Block[]) => void;
-  getTransactions: () => Transaction[];
+  blockIdsByHeight: { [height: number]: string };
+  appendBlock: (block_id: string, block: Block) => void;
+  getTransactions: (height: number) => Transaction[];
   tipHeader?: BlockIdHeaderPair;
   setTipHeader: (tipHeader: BlockIdHeaderPair) => void;
 }
 
 export const useFieldStore = create<FieldState>()((set, get) => ({
   blocksById: {},
-  pushBlocks: (blocks = []) =>
+  blockIdsByHeight: {},
+  appendBlock: (block_id, block) =>
     set((state) => ({
       blocksById: {
         ...state.blocksById,
-        ...blocks.reduce((p, c) => ({ ...p, [c.block_id]: c }), {}),
+        [block_id]: block,
+      },
+      blockIdsByHeight: {
+        ...state.blockIdsByHeight,
+        [block.header.height]: block_id,
       },
     })),
-  getTransactions: () => {
-    return Object.values(get().blocksById).flatMap(
-      (block) => block?.transactions ?? [],
-    );
+  getTransactions: (height) => {
+    const block_id = get().blockIdsByHeight[height];
+    return get().blocksById[block_id]?.transactions ?? [];
   },
   tipHeader: undefined,
   setTipHeader: (tipHeader) => set({ tipHeader }),
@@ -66,7 +72,7 @@ export const useFieldStore = create<FieldState>()((set, get) => ({
 
 interface HeartState {
   blocksByPubKey: { [pubKey: string]: Block[] | null | undefined };
-  pushBlocks: (publicKey: string, blocks?: Block[]) => void;
+  appendBlocks: (publicKey: string, blocks?: Block[]) => void;
   getTransactions: (pubKey: string) => Transaction[];
   balancesByPubKey: { [pubKey: string]: Balance | null | undefined };
   getBalance: (pubKey: string) => Balance | null | undefined;
@@ -75,7 +81,7 @@ interface HeartState {
 
 export const useHeartStore = create<HeartState>()((set, get) => ({
   blocksByPubKey: {},
-  pushBlocks: (publicKey, blocks = []) =>
+  appendBlocks: (publicKey, blocks = []) =>
     set((state) => ({
       blocksByPubKey: {
         ...state.blocksByPubKey,

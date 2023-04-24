@@ -24,6 +24,7 @@
     "react-router": "^5.2.0",
     "react-router-dom": "^5.2.0",
     "react-scripts": "5.0.1",
+    "react-use-pagination": "^2.0.1",
     "react-use-websocket": "^4.3.1",
     "tweetnacl": "^1.0.3",
     "tweetnacl-util": "^0.15.1",

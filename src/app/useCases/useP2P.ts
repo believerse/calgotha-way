@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import useWebSocket from 'react-use-websocket';
 import { PEER_STRING, GENESIS_BLOCK_ID } from '../utils/constants';
-import { useFieldStore, useHeartStore } from './useStore';
+import { BlockIdHeaderPair, useFieldStore, useHeartStore } from './useStore';
 import { signTransaction, useSecrets } from './useSecrets';
 
 export const useP2P = () => {
@@ -15,13 +15,15 @@ export const useP2P = () => {
   const tipHeader = useFieldStore((state) => state.tipHeader);
   const setTipHeader = useFieldStore((state) => state.setTipHeader);
 
+  const blockIdByHeight = useFieldStore((state) => state.blockIdsByHeight);
+
   const fieldTransactions = useFieldStore((state) => state.getTransactions);
-  const pushFieldBlocks = useFieldStore((state) => state.pushBlocks);
+  const appendFieldBlock = useFieldStore((state) => state.appendBlock);
 
   const balance = useHeartStore((state) => state.getBalance);
   const setBalance = useHeartStore((state) => state.setBalance);
   const heartTransactions = useHeartStore((state) => state.getTransactions);
-  const pushHeartBlocks = useHeartStore((state) => state.pushBlocks);
+  const appendHeartBlocks = useHeartStore((state) => state.appendBlocks);
 
   const { sendJsonMessage, readyState } = useWebSocket(
     `wss://${PEER_STRING}/${GENESIS_BLOCK_ID}`,
@@ -35,36 +37,43 @@ export const useP2P = () => {
 
         switch (type) {
           case 'inv_block':
+            //Todo: show toast notification of new block
             body.block_ids.forEach((block_id: string) => {
-              getBlock(block_id);
+              getBlockById(block_id);
             });
             break;
           case 'tip_header':
             setTipHeader(body);
-            getBlock(body.block_id);
-            //Todo: get earlier blocks using getByHeight()
             break;
           case 'balance':
             setBalance(body);
             break;
           case 'block':
-            pushFieldBlocks([body.block]);
+            appendFieldBlock(body.block_id, body.block);
             break;
           case 'push_transaction_result':
             setPushTxResult(body);
             break;
           case 'public_key_transactions':
-            pushHeartBlocks(body.public_key, body.filter_blocks ?? []);
+            appendHeartBlocks(body.public_key, body.filter_blocks ?? []);
             break;
         }
       },
     },
   );
 
-  const getBlock = (block_id: string) => {
+  const getBlockById = (block_id: string) => {
     sendJsonMessage({
       type: 'get_block',
       body: { block_id },
+    });
+  };
+
+  const getBlockByHeight = (height: number) => {
+    if (!!blockIdByHeight[height]) return;
+    sendJsonMessage({
+      type: 'get_block_by_height',
+      body: { height },
     });
   };
 
@@ -134,7 +143,7 @@ export const useP2P = () => {
 
   return {
     readyState,
-    getBlock,
+    getBlock: getBlockById,
     tipHeader,
     getTipHeader,
     balance,
@@ -145,5 +154,6 @@ export const useP2P = () => {
     fieldTransactions,
     getHeartTransactions,
     heartTransactions,
+    getBlockByHeight,
   };
 };
