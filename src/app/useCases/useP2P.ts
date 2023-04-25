@@ -1,7 +1,7 @@
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import useWebSocket from 'react-use-websocket';
 import { PEER_STRING, GENESIS_BLOCK_ID } from '../utils/constants';
-import { BlockIdHeaderPair, useFieldStore, useHeartStore } from './useStore';
+import { useFieldStore, useHeartStore } from './useStore';
 import { signTransaction, useSecrets } from './useSecrets';
 
 export const useP2P = () => {
@@ -69,17 +69,20 @@ export const useP2P = () => {
     });
   };
 
-  const getBlockByHeight = (height: number) => {
-    if (!!blockIdByHeight[height]) return;
-    sendJsonMessage({
-      type: 'get_block_by_height',
-      body: { height },
-    });
-  };
+  const getBlockByHeight = useCallback(
+    (height: number) => {
+      if (!!blockIdByHeight[height]) return;
+      sendJsonMessage({
+        type: 'get_block_by_height',
+        body: { height },
+      });
+    },
+    [sendJsonMessage, blockIdByHeight],
+  );
 
-  const getTipHeader = () => {
+  const getTipHeader = useCallback(() => {
     sendJsonMessage({ type: 'get_tip_header' });
-  };
+  }, [sendJsonMessage]);
 
   const applyFilter = (publicKeysB64: string[]) => {
     if (publicKeysB64.length) {

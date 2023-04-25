@@ -36,7 +36,13 @@ const Field = () => {
     if (readyState === ReadyState.OPEN) {
       getTipHeader();
     }
-  }, [tipHeight, readyState]);
+  }, [readyState, getTipHeader]);
+
+  useEffect(() => {
+    if (tipHeight > 0) {
+      getBlockByHeight(currentPage);
+    }
+  }, [currentPage, tipHeight, getBlockByHeight]);
 
   return (
     <PageShell
@@ -46,20 +52,11 @@ const Field = () => {
           <ConnectionStatus readyState={readyState} />
           {!!tipHeight && (
             <>
-              <button
-                onClick={() => {
-                  getBlockByHeight(0);
-                  setPage(0);
-                }}
-                disabled={currentPage === 0}
-              >
+              <button onClick={() => setPage(0)} disabled={currentPage === 0}>
                 Genesis
               </button>
               <button
-                onClick={() => {
-                  getBlockByHeight(currentPage - 1);
-                  setPreviousPage();
-                }}
+                onClick={() => setPreviousPage()}
                 disabled={!previousEnabled}
               >
                 Prev
@@ -67,20 +64,11 @@ const Field = () => {
               <IonLabel>
                 {currentPage + 1} of {totalPages}
               </IonLabel>
-              <button
-                onClick={() => {
-                  getBlockByHeight(currentPage + 1);
-                  setNextPage();
-                }}
-                disabled={!nextEnabled}
-              >
+              <button onClick={() => setNextPage()} disabled={!nextEnabled}>
                 Next
               </button>
               <button
-                onClick={() => {
-                  getBlockByHeight(tipHeight);
-                  setPage(tipHeight + 1);
-                }}
+                onClick={() => setPage(tipHeight + 1)}
                 disabled={currentPage + 1 === tipHeight + 1}
               >
                 Latest
