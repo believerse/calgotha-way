@@ -23,10 +23,11 @@ const Field = () => {
     totalPages,
     setNextPage,
     setPreviousPage,
+    setPage,
     nextEnabled,
     previousEnabled,
   } = usePagination({
-    totalItems: tipHeight,
+    totalItems: tipHeight + 1,
     initialPage: tipHeight,
     initialPageSize: 1,
   });
@@ -43,27 +44,49 @@ const Field = () => {
       renderBody={() => (
         <>
           <ConnectionStatus readyState={readyState} />
-          <button
-            onClick={() => {
-              getBlockByHeight(currentPage - 1);
-              setPreviousPage();
-            }}
-            disabled={!previousEnabled}
-          >
-            Prev
-          </button>
-          <IonLabel>
-            {currentPage} of {totalPages}
-          </IonLabel>
-          <button
-            onClick={() => {
-              getBlockByHeight(currentPage + 1);
-              setNextPage();
-            }}
-            disabled={!nextEnabled}
-          >
-            Next
-          </button>
+          {!!tipHeight && (
+            <>
+              <button
+                onClick={() => {
+                  getBlockByHeight(0);
+                  setPage(0);
+                }}
+                disabled={currentPage === 0}
+              >
+                Genesis
+              </button>
+              <button
+                onClick={() => {
+                  getBlockByHeight(currentPage - 1);
+                  setPreviousPage();
+                }}
+                disabled={!previousEnabled}
+              >
+                Prev
+              </button>
+              <IonLabel>
+                {currentPage + 1} of {totalPages}
+              </IonLabel>
+              <button
+                onClick={() => {
+                  getBlockByHeight(currentPage + 1);
+                  setNextPage();
+                }}
+                disabled={!nextEnabled}
+              >
+                Next
+              </button>
+              <button
+                onClick={() => {
+                  getBlockByHeight(tipHeight);
+                  setPage(tipHeight + 1);
+                }}
+                disabled={currentPage + 1 === tipHeight + 1}
+              >
+                Latest
+              </button>
+            </>
+          )}
           <CrucifixionList crucifixions={fieldTransactions(currentPage)} />
         </>
       )}
