@@ -63,9 +63,9 @@ export const CrucifixionList = ({
           <IonLabel>{heading}</IonLabel>
         </IonListHeader>
       )}
-      {crucifixions.map((tx) => (
+      {crucifixions.map((tx, index) => (
         <CrucifixionItem
-          key={tx.time}
+          key={index}
           from={tx.from}
           to={tx.to}
           memo={tx.memo}

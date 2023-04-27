@@ -1,4 +1,4 @@
-import { IonButton, IonText, useIonViewDidEnter } from '@ionic/react';
+import { IonButton, IonText } from '@ionic/react';
 import { PageShell } from '../components/pageShell';
 import QRCode from 'react-qr-code';
 import { useP2P } from '../useCases/useP2P';
@@ -6,6 +6,7 @@ import { useSecrets } from '../useCases/useSecrets';
 import { CrucifixionList } from '../components/crucifixion';
 import exportFromJSON from 'export-from-json';
 import { ReadyState } from 'react-use-websocket';
+import { useEffect } from 'react';
 
 const Heart = () => {
   const { keyPairB64, generateKeyPairB64 } = useSecrets();
@@ -33,12 +34,12 @@ const Heart = () => {
     exportFromJSON({ data, fileName, exportType });
   };
 
-  useIonViewDidEnter(() => {
+  useEffect(() => {
     if (readyState === ReadyState.OPEN && publicKey) {
       getBalance(publicKey);
       getHeartTransactions(publicKey);
     }
-  });
+  }, [readyState, publicKey, getBalance, getHeartTransactions]);
 
   return (
     <PageShell

@@ -95,16 +95,19 @@ export const useP2P = () => {
     }
   };
 
-  const getBalance = (publicKeyB64: string) => {
-    if (!publicKeyB64) throw new Error('missing publicKey');
+  const getBalance = useCallback(
+    (publicKeyB64: string) => {
+      if (!publicKeyB64) throw new Error('missing publicKey');
 
-    sendJsonMessage({
-      type: 'get_balance',
-      body: {
-        public_key: publicKeyB64,
-      },
-    });
-  };
+      sendJsonMessage({
+        type: 'get_balance',
+        body: {
+          public_key: publicKeyB64,
+        },
+      });
+    },
+    [sendJsonMessage],
+  );
 
   const pushTransaction = (to: string, memo: string) => {
     setPushTxResult(undefined);
@@ -128,21 +131,24 @@ export const useP2P = () => {
     }
   };
 
-  const getHeartTransactions = (publicKeyB64: string) => {
-    if (!publicKeyB64) throw new Error('missing publicKey');
+  const getHeartTransactions = useCallback(
+    (publicKeyB64: string) => {
+      if (!publicKeyB64) throw new Error('missing publicKey');
 
-    if (tipHeader?.header.height) {
-      sendJsonMessage({
-        type: 'get_public_key_transactions',
-        body: {
-          public_key: publicKeyB64,
-          start_height: tipHeader?.header.height + 1,
-          end_height: 0,
-          limit: 10,
-        },
-      });
-    }
-  };
+      if (tipHeader?.header.height) {
+        sendJsonMessage({
+          type: 'get_public_key_transactions',
+          body: {
+            public_key: publicKeyB64,
+            start_height: tipHeader?.header.height + 1,
+            end_height: 0,
+            limit: 10,
+          },
+        });
+      }
+    },
+    [sendJsonMessage, tipHeader],
+  );
 
   return {
     readyState,
