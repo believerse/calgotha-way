@@ -10,7 +10,9 @@ import {
   IonCardSubtitle,
   IonCardTitle,
   useIonModal,
+  IonText,
 } from '@ionic/react';
+import timeago from 'epoch-timeago';
 import { PageShell } from '../pageShell';
 import { Transaction } from '../../useCases/useStore';
 
@@ -20,13 +22,24 @@ export const CrucifixionItem: React.FC<Transaction> = (crucifixion) => {
     crucifixion,
   });
 
+  const { time, memo } = crucifixion;
+
+  const timeMS = time * 1000;
+
   return (
     <IonItem onClick={() => present()}>
-      <IonLabel>
-        <h2>
-          <b>Crucified for...</b>
-        </h2>
-        {crucifixion.memo && <p>{crucifixion.memo}</p>}
+      <IonLabel className="ion-text-wrap">
+        <IonText color="primary">
+          <sub>{crucifixion.to}</sub>
+        </IonText>
+        <IonText color="tertiary">
+          <sub>
+            <time dateTime={new Date(timeMS).toISOString()}>
+              <p>{timeago(timeMS)}</p>
+            </time>
+          </sub>
+        </IonText>
+        {memo && <p>{memo}</p>}
       </IonLabel>
     </IonItem>
   );

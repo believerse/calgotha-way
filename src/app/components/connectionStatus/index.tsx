@@ -18,7 +18,7 @@ const ConnectionStatus: React.FC<ConnectionStatusProps> = ({ readyState }) => {
     <div className="connection-status-root">
       <strong>Not connected</strong>
       <p>
-        Connection is <i>${connectionStatus}</i>
+        <i>{connectionStatus}</i>
       </p>
     </div>
   ) : null;

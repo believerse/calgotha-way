@@ -39,6 +39,7 @@ const Field = () => {
   }, [readyState, getTipHeader]);
 
   useEffect(() => {
+    //when pagination page changes
     if (tipHeight > 0) {
       getBlockByHeight(currentPage);
     }
