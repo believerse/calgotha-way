@@ -1,6 +1,7 @@
 {
   "name": "calgotha-way",
   "version": "0.1.0",
+  "homepage": "https://believerse.github.io/calgotha-way",
   "private": true,
   "dependencies": {
     "@ionic/react": "^7.0.0",
@@ -46,6 +47,8 @@
     "zustand": "^4.3.7"
   },
   "scripts": {
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build",
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
@@ -68,5 +71,8 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "gh-pages": "^5.0.0"
   }
 }
