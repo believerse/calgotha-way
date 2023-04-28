@@ -1,21 +1,21 @@
 {
   "files": {
-    "main.css": "/calgotha-way/static/css/main.cd3adffe.css",
-    "main.js": "/calgotha-way/static/js/main.1f021ac8.js",
-    "static/js/769.310aa529.chunk.js": "/calgotha-way/static/js/769.310aa529.chunk.js",
-    "static/js/336.f6790665.chunk.js": "/calgotha-way/static/js/336.f6790665.chunk.js",
-    "static/js/261.ec48d8b1.chunk.js": "/calgotha-way/static/js/261.ec48d8b1.chunk.js",
-    "static/js/337.3ae949b3.chunk.js": "/calgotha-way/static/js/337.3ae949b3.chunk.js",
-    "static/js/203.d8b9fd3c.chunk.js": "/calgotha-way/static/js/203.d8b9fd3c.chunk.js",
-    "static/js/934.e50a2b8c.chunk.js": "/calgotha-way/static/js/934.e50a2b8c.chunk.js",
-    "static/js/161.63ad4cbb.chunk.js": "/calgotha-way/static/js/161.63ad4cbb.chunk.js",
-    "static/js/716.ae7b6618.chunk.js": "/calgotha-way/static/js/716.ae7b6618.chunk.js",
-    "static/js/27.37d56d23.chunk.js": "/calgotha-way/static/js/27.37d56d23.chunk.js",
-    "service-worker.js": "/calgotha-way/service-worker.js",
-    "index.html": "/calgotha-way/index.html"
+    "main.css": "/static/css/main.cd3adffe.css",
+    "main.js": "/static/js/main.6817878d.js",
+    "static/js/769.310aa529.chunk.js": "/static/js/769.310aa529.chunk.js",
+    "static/js/336.f6790665.chunk.js": "/static/js/336.f6790665.chunk.js",
+    "static/js/261.ec48d8b1.chunk.js": "/static/js/261.ec48d8b1.chunk.js",
+    "static/js/337.3ae949b3.chunk.js": "/static/js/337.3ae949b3.chunk.js",
+    "static/js/203.d8b9fd3c.chunk.js": "/static/js/203.d8b9fd3c.chunk.js",
+    "static/js/934.e50a2b8c.chunk.js": "/static/js/934.e50a2b8c.chunk.js",
+    "static/js/161.63ad4cbb.chunk.js": "/static/js/161.63ad4cbb.chunk.js",
+    "static/js/716.ae7b6618.chunk.js": "/static/js/716.ae7b6618.chunk.js",
+    "static/js/27.37d56d23.chunk.js": "/static/js/27.37d56d23.chunk.js",
+    "service-worker.js": "/service-worker.js",
+    "index.html": "/index.html"
   },
   "entrypoints": [
     "static/css/main.cd3adffe.css",
-    "static/js/main.1f021ac8.js"
+    "static/js/main.6817878d.js"
   ]
 }
