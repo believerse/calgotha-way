@@ -1,7 +1,7 @@
 {
   "files": {
     "main.css": "/calgotha-way/static/css/main.cd3adffe.css",
-    "main.js": "/calgotha-way/static/js/main.c2258f08.js",
+    "main.js": "/calgotha-way/static/js/main.1f021ac8.js",
     "static/js/769.310aa529.chunk.js": "/calgotha-way/static/js/769.310aa529.chunk.js",
     "static/js/336.f6790665.chunk.js": "/calgotha-way/static/js/336.f6790665.chunk.js",
     "static/js/261.ec48d8b1.chunk.js": "/calgotha-way/static/js/261.ec48d8b1.chunk.js",
@@ -16,6 +16,6 @@
   },
   "entrypoints": [
     "static/css/main.cd3adffe.css",
-    "static/js/main.c2258f08.js"
+    "static/js/main.1f021ac8.js"
   ]
 }
