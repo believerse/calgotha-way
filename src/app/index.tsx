@@ -9,7 +9,7 @@ import {
   IonTabs,
   setupIonicReact,
 } from '@ionic/react';
-import { IonReactRouter } from '@ionic/react-router';
+import { IonReactHashRouter } from '@ionic/react-router';
 import { ellipseOutline, squareOutline } from 'ionicons/icons';
 import { FaCross } from 'react-icons/fa';
 import Crucify from './pages/crucify';
@@ -36,7 +36,7 @@ import '@ionic/react/css/display.css';
 import './theme/variables.css';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const HackIonReactRouter = IonReactRouter as any;
+const HackIonReactRouter = IonReactHashRouter as any;
 
 setupIonicReact();
 

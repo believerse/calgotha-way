@@ -1,7 +1,7 @@
 {
   "name": "calgotha-way",
   "version": "0.1.0",
-  "homepage": "https://believerse.github.io/calgotha-way",
+  "homepage": "https://calgotha.believerse.love",
   "private": true,
   "dependencies": {
     "@ionic/react": "^7.0.0",
