@@ -11,10 +11,12 @@ import {
   IonCardTitle,
   useIonModal,
   IonText,
+  IonNote,
 } from '@ionic/react';
 import timeago from 'epoch-timeago';
 import { PageShell } from '../pageShell';
 import { Transaction } from '../../useCases/useStore';
+import KeyViewer from '../keyViewer';
 
 export const CrucifixionItem: React.FC<Transaction> = (crucifixion) => {
   const [present, dismiss] = useIonModal(CrucifixionDetail, {
@@ -29,9 +31,7 @@ export const CrucifixionItem: React.FC<Transaction> = (crucifixion) => {
   return (
     <IonItem onClick={() => present()}>
       <IonLabel className="ion-text-wrap">
-        <IonText color="primary">
-          <sub>{crucifixion.to}</sub>
-        </IonText>
+        <KeyViewer value={crucifixion.to} />
         <IonText color="tertiary">
           <sub>
             <time dateTime={new Date(timeMS).toISOString()}>
@@ -91,7 +91,14 @@ export const CrucifixionDetail = ({
         <IonCard>
           <IonCardHeader>
             <IonCardTitle>Crucifixion notice</IonCardTitle>
-            <IonCardSubtitle>{crucifixion.to}</IonCardSubtitle>
+            <IonCardSubtitle>
+              <KeyViewer value={crucifixion.to} />
+            </IonCardSubtitle>
+            <IonLabel>
+              <IonNote>
+                {new Date(crucifixion.time * 1000).toDateString()}
+              </IonNote>
+            </IonLabel>
           </IonCardHeader>
           <IonCardContent>{crucifixion.memo}</IonCardContent>
         </IonCard>
