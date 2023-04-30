@@ -1,12 +1,14 @@
-import { IonButton, IonText } from '@ionic/react';
+import { IonButton, IonText, IonIcon, useIonActionSheet } from '@ionic/react';
 import { PageShell } from '../components/pageShell';
-import QRCode from 'react-qr-code';
 import { useP2P } from '../useCases/useP2P';
 import { useSecrets } from '../useCases/useSecrets';
 import { CrucifixionList } from '../components/crucifixion';
 import exportFromJSON from 'export-from-json';
 import { ReadyState } from 'react-use-websocket';
 import { useEffect } from 'react';
+import { ellipsisHorizontal, ellipsisVertical } from 'ionicons/icons';
+import type { OverlayEventDetail } from '@ionic/core';
+import KeyViewer from '../components/keyViewer';
 
 const Heart = () => {
   const { keyPairB64, generateKeyPairB64 } = useSecrets();
@@ -41,9 +43,56 @@ const Heart = () => {
     }
   }, [readyState, publicKey, getBalance, getHeartTransactions]);
 
+  const [present] = useIonActionSheet();
+
+  const handleActionSheet = ({ data, role }: OverlayEventDetail) => {
+    if (data['action'] === 'export') {
+      exportKeys();
+    }
+  };
+
   return (
     <PageShell
       title="Heart"
+      tools={[
+        {
+          label: 'action sheet',
+          renderIcon: () => (
+            <IonIcon
+              slot="icon-only"
+              ios={ellipsisHorizontal}
+              md={ellipsisVertical}
+            ></IonIcon>
+          ),
+          action: () =>
+            present({
+              onDidDismiss: ({ detail }) => handleActionSheet(detail),
+              header: 'Actions',
+              buttons: [
+                {
+                  text: 'Delete keys',
+                  role: 'destructive',
+                  data: {
+                    action: 'delete',
+                  },
+                },
+                {
+                  text: 'Export keys',
+                  data: {
+                    action: 'export',
+                  },
+                },
+                {
+                  text: 'Cancel',
+                  role: 'cancel',
+                  data: {
+                    action: 'cancel',
+                  },
+                },
+              ],
+            }),
+        },
+      ]}
       renderBody={() => (
         <>
           <p>
@@ -61,33 +110,7 @@ const Heart = () => {
           </p>
           {!!publicKey && (
             <>
-              <div
-                style={{
-                  height: 'auto',
-                  margin: '0 auto',
-                  maxWidth: 200,
-                  width: '100%',
-                }}
-              >
-                <QRCode
-                  id="QRCode"
-                  size={256}
-                  style={{
-                    background: 'white',
-                    padding: '8px',
-                    height: 'auto',
-                    maxWidth: '100%',
-                    width: '100%',
-                  }}
-                  value={publicKey}
-                  viewBox={`0 0 256 256`}
-                />
-              </div>
-              <IonText color="warning">{publicKey}</IonText>
-              <IonButton strong={true} onClick={exportKeys}>
-                Export keypair
-              </IonButton>
-
+              <KeyViewer value={publicKey} />
               {pubKeyBalance !== undefined && (
                 <div className="container">
                   <strong>Balance</strong>
@@ -98,7 +121,7 @@ const Heart = () => {
               )}
               {transactions && transactions.length && (
                 <CrucifixionList
-                  heading="My Crucifixions"
+                  heading="My Crosses"
                   crucifixions={transactions}
                 />
               )}
