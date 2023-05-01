@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback } from 'react';
 import useWebSocket from 'react-use-websocket';
 import { PEER_STRING, GENESIS_BLOCK_ID } from '../utils/constants';
 import { useFieldStore, useHeartStore } from './useStore';
@@ -6,11 +6,6 @@ import { signTransaction, useSecrets } from './useSecrets';
 
 export const useP2P = () => {
   const { keyPairB64 } = useSecrets();
-
-  const [pushTransactionResult, setPushTxResult] = useState<{
-    transaction_id: string;
-    error: string;
-  }>();
 
   const tipHeader = useFieldStore((state) => state.tipHeader);
   const setTipHeader = useFieldStore((state) => state.setTipHeader);
@@ -37,7 +32,7 @@ export const useP2P = () => {
 
         switch (type) {
           case 'inv_block':
-            //Todo: show toast notification of new block
+            //Todo: dispatch event for new block
             body.block_ids.forEach((block_id: string) => {
               getBlockById(block_id);
             });
@@ -52,7 +47,12 @@ export const useP2P = () => {
             appendFieldBlock(body.block_id, body.block);
             break;
           case 'push_transaction_result':
-            setPushTxResult(body);
+            document.dispatchEvent(
+              new CustomEvent<{
+                transaction_id: string;
+                error: string;
+              }>('push_transaction_result', { detail: body }),
+            );
             break;
           case 'public_key_transactions':
             appendHeartBlocks(body.public_key, body.filter_blocks ?? []);
@@ -110,8 +110,6 @@ export const useP2P = () => {
   );
 
   const pushTransaction = (to: string, memo: string) => {
-    setPushTxResult(undefined);
-
     if (to && memo && tipHeader?.header.height && keyPairB64) {
       const transaction = signTransaction(
         to,
@@ -159,7 +157,6 @@ export const useP2P = () => {
     getBalance,
     applyFilter,
     pushTransaction,
-    pushTransactionResult,
     fieldTransactions,
     getHeartTransactions,
     heartTransactions,

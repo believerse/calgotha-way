@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect } from 'react';
 import {
   IonButton,
   IonCard,
@@ -10,50 +10,88 @@ import {
   IonItem,
   IonList,
   IonTextarea,
-  IonToast,
   useIonModal,
+  useIonToast,
 } from '@ionic/react';
+import type { OverlayEventDetail } from '@ionic/core';
 import { PageShell } from '../components/pageShell';
+import ConnectionStatus from '../components/connectionStatus';
 import { Html5QrcodePlugin } from '../utils/qr-scanner';
 import { useP2P } from '../useCases/useP2P';
-import { OverlayEventDetail } from '@ionic/react/dist/types/components/react-component-lib/interfaces';
+import { useInputValidationProps } from '../useCases/useInputValidation';
+import { ReadyState } from 'react-use-websocket';
 
 const Crucify = () => {
-  const [offender, setOffender] = useState<string>('');
-  const [charge, setCharge] = useState<string>('');
+  const {
+    value: offender,
+    onBlur: onBlurOffender,
+    isValid: isOffenderValid,
+    isTouched: isOffenderTouched,
+    onInputChange: setOffender,
+  } = useInputValidationProps((offender: string) =>
+    new RegExp('[A-Za-z0-9/+]{43}=').test(offender),
+  );
 
-  const { pushTransaction, pushTransactionResult } = useP2P();
+  const {
+    value: charge,
+    onBlur: onBlurCharge,
+    isValid: isChargeValid,
+    isTouched: isChargeTouched,
+    onInputChange: setCharge,
+  } = useInputValidationProps(
+    (charge: string) => charge.length > 0 || charge.length <= 140,
+  );
+
+  const { readyState, getTipHeader, pushTransaction } = useP2P();
+
+  useEffect(() => {
+    if (readyState === ReadyState.OPEN) {
+      getTipHeader();
+    }
+  }, [readyState, getTipHeader]);
 
   const execute = () => {
-    //Todo: client side validation
+    if (!isOffenderValid || !isChargeValid) {
+      return;
+    }
     pushTransaction(offender, charge);
   };
 
-  const [isOpen, setIsOpen] = useState(true);
-
-  const [present, dismiss] = useIonModal(ScanQR, {
-    onDismiss: (data?: string) => dismiss(data),
+  const [presentScanner, dismissScanner] = useIonModal(ScanQR, {
+    onDismiss: (data?: string) => dismissScanner(data),
   });
+
+  const [presentToast] = useIonToast();
+
+  useEffect(() => {
+    const pushResultHandler = (data: any) =>
+      presentToast({
+        message:
+          data.detail.error ||
+          `Crucifixion: ${data.detail.transaction_id} was executed`,
+        duration: 5000,
+        position: 'bottom',
+      });
+
+    document.addEventListener('push_transaction_result', pushResultHandler);
+
+    return () => {
+      document.removeEventListener(
+        'push_transaction_result',
+        pushResultHandler,
+      );
+    };
+  }, [presentToast]);
 
   return (
     <PageShell
       title="Crucify"
       renderBody={() => (
         <>
-          {pushTransactionResult && (
-            <IonToast
-              isOpen={isOpen}
-              message={
-                pushTransactionResult.error ||
-                `Crucifixion: ${pushTransactionResult.transaction_id} was executed`
-              }
-              onDidDismiss={() => setIsOpen(false)}
-              duration={5000}
-            />
-          )}
+          <ConnectionStatus readyState={readyState} />
           <button
             onClick={() => {
-              present({
+              presentScanner({
                 onWillDismiss: (ev: CustomEvent<OverlayEventDetail>) => {
                   setOffender(ev.detail.data);
                 },
@@ -65,12 +103,16 @@ const Crucify = () => {
           <IonList>
             <IonItem>
               <IonInput
+                className={`${isOffenderValid && 'ion-valid'} ${
+                  isOffenderValid === false && 'ion-invalid'
+                } ${isOffenderTouched && 'ion-touched'}`}
                 label="Cross bearer / Offender"
                 labelPlacement="stacked"
                 clearInput={true}
-                placeholder="xxx-xxx-xxxx-xxxx-xxxx"
+                errorText="Invalid public key"
                 value={offender}
                 type="text"
+                onIonBlur={onBlurOffender}
                 onIonInput={(event) =>
                   setOffender(event.target.value?.toString() ?? '')
                 }
@@ -79,17 +121,22 @@ const Crucify = () => {
 
             <IonItem>
               <IonTextarea
+                className={`${isChargeValid && 'ion-valid'} ${
+                  isChargeValid === false && 'ion-invalid'
+                } ${isChargeTouched && 'ion-touched'}`}
                 label="Head sign / Charge"
                 labelPlacement="stacked"
                 counter={true}
                 maxlength={140}
                 value={charge}
+                onIonBlur={onBlurCharge}
                 onIonInput={(event) => setCharge(event.target.value ?? '')}
               />
             </IonItem>
           </IonList>
 
           <IonButton
+            disabled={!isOffenderValid || !isChargeValid}
             expand="full"
             onClick={execute}
             class="ion-padding ion-no-margin"
@@ -110,8 +157,6 @@ export const ScanQR = ({
   onDismiss: (decodedText?: string) => void;
 }) => {
   const onNewScanResult = (decodedText: string, decodedResult: any) => {
-    console.log(decodedResult);
-    //Todo: validate scan result is valid public key
     onDismiss(decodedText);
   };
   return (
