@@ -1,4 +1,3 @@
-import { ReadyState } from 'react-use-websocket';
 import ConnectionStatus from '../components/connectionStatus';
 import { CrucifixionList } from '../components/crucifixion';
 import { PageShell } from '../components/pageShell';
@@ -8,13 +7,8 @@ import { IonLabel } from '@ionic/react';
 import { usePagination } from 'react-use-pagination';
 
 const Field = () => {
-  const {
-    readyState,
-    tipHeader,
-    getTipHeader,
-    getBlockByHeight,
-    fieldTransactions,
-  } = useP2P();
+  const { readyState, tipHeader, getBlockByHeight, fieldTransactions } =
+    useP2P();
 
   const tipHeight = tipHeader?.header.height ?? 0;
 
@@ -31,12 +25,6 @@ const Field = () => {
     initialPage: tipHeight,
     initialPageSize: 1,
   });
-
-  useEffect(() => {
-    if (readyState === ReadyState.OPEN) {
-      getTipHeader();
-    }
-  }, [readyState, getTipHeader]);
 
   useEffect(() => {
     //when pagination page changes

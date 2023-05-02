@@ -34,46 +34,59 @@ import '@ionic/react/css/display.css';
 
 /* Theme variables */
 import './theme/variables.css';
+import { useP2P } from './useCases/useP2P';
+import { useEffect } from 'react';
+import { ReadyState } from 'react-use-websocket';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const HackIonReactRouter = IonReactHashRouter as any;
 
 setupIonicReact();
 
-const App: React.FC = () => (
-  <IonApp>
-    <HackIonReactRouter>
-      <IonTabs>
-        <IonRouterOutlet>
-          <Route exact path="/field">
-            <Field />
-          </Route>
-          <Route exact path="/heart">
-            <Heart />
-          </Route>
-          <Route exact path="/crucify">
-            <Crucify />
-          </Route>
-          <Route exact path="/">
-            <Redirect to="/field" />
-          </Route>
-        </IonRouterOutlet>
-        <IonTabBar slot="bottom">
-          <IonTabButton tab="field" href="/field">
-            <IonIcon aria-hidden="true" icon={squareOutline} />
-            <IonLabel>Field</IonLabel>
-          </IonTabButton>
-          <IonTabButton tab="crucify" href="/crucify">
-            <FaCross />
-          </IonTabButton>
-          <IonTabButton tab="heart" href="/heart">
-            <IonIcon aria-hidden="true" icon={ellipseOutline} />
-            <IonLabel>Heart</IonLabel>
-          </IonTabButton>
-        </IonTabBar>
-      </IonTabs>
-    </HackIonReactRouter>
-  </IonApp>
-);
+const App: React.FC = () => {
+  const { readyState, getTipHeader } = useP2P();
+
+  useEffect(() => {
+    if (readyState === ReadyState.OPEN) {
+      getTipHeader();
+    }
+  }, [readyState, getTipHeader]);
+
+  return (
+    <IonApp>
+      <HackIonReactRouter>
+        <IonTabs>
+          <IonRouterOutlet>
+            <Route exact path="/field">
+              <Field />
+            </Route>
+            <Route exact path="/heart">
+              <Heart />
+            </Route>
+            <Route exact path="/crucify">
+              <Crucify />
+            </Route>
+            <Route exact path="/">
+              <Redirect to="/field" />
+            </Route>
+          </IonRouterOutlet>
+          <IonTabBar slot="bottom">
+            <IonTabButton tab="field" href="/field">
+              <IonIcon aria-hidden="true" icon={squareOutline} />
+              <IonLabel>Field</IonLabel>
+            </IonTabButton>
+            <IonTabButton tab="crucify" href="/crucify">
+              <FaCross />
+            </IonTabButton>
+            <IonTabButton tab="heart" href="/heart">
+              <IonIcon aria-hidden="true" icon={ellipseOutline} />
+              <IonLabel>Heart</IonLabel>
+            </IonTabButton>
+          </IonTabBar>
+        </IonTabs>
+      </HackIonReactRouter>
+    </IonApp>
+  );
+};
 
 export default App;

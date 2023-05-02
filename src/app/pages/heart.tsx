@@ -43,10 +43,10 @@ const Heart = () => {
     }
   }, [readyState, publicKey, getBalance, getHeartTransactions]);
 
-  const [present] = useIonActionSheet();
+  const [presentActionSheet] = useIonActionSheet();
 
   const handleActionSheet = ({ data, role }: OverlayEventDetail) => {
-    if (data['action'] === 'export') {
+    if (data?.['action'] === 'export') {
       exportKeys();
     }
   };
@@ -65,7 +65,7 @@ const Heart = () => {
             ></IonIcon>
           ),
           action: () =>
-            present({
+            presentActionSheet({
               onDidDismiss: ({ detail }) => handleActionSheet(detail),
               header: 'Actions',
               buttons: [

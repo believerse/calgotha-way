@@ -19,7 +19,6 @@ import ConnectionStatus from '../components/connectionStatus';
 import { Html5QrcodePlugin } from '../utils/qr-scanner';
 import { useP2P } from '../useCases/useP2P';
 import { useInputValidationProps } from '../useCases/useInputValidation';
-import { ReadyState } from 'react-use-websocket';
 
 const Crucify = () => {
   const {
@@ -42,13 +41,7 @@ const Crucify = () => {
     (charge: string) => charge.length > 0 || charge.length <= 140,
   );
 
-  const { readyState, getTipHeader, pushTransaction } = useP2P();
-
-  useEffect(() => {
-    if (readyState === ReadyState.OPEN) {
-      getTipHeader();
-    }
-  }, [readyState, getTipHeader]);
+  const { readyState, pushTransaction } = useP2P();
 
   const execute = () => {
     if (!isOffenderValid || !isChargeValid) {
