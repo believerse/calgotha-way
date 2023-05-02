@@ -100,15 +100,13 @@ export const CrucifixionDetail = ({
             </IonLabel>
           </IonCardHeader>
           <IonCardContent>
-            <IonList>
-              <IonItem>
-                From: <KeyViewer value={crucifixion.from} />
-              </IonItem>
-              <IonItem>
-                To: <KeyViewer value={crucifixion.to} />
-              </IonItem>
-              <IonItem>{crucifixion.memo}</IonItem>
-            </IonList>
+            <p>
+              From: <KeyViewer value={crucifixion.from} />
+            </p>
+            <p>
+              To: <KeyViewer value={crucifixion.to} />
+            </p>
+            <p>{crucifixion.memo}</p>
           </IonCardContent>
         </IonCard>
       )}
