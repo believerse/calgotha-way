@@ -88,11 +88,21 @@ export const CreateAccount = ({
 }) => {
   return (
     <>
-      <IonText color="danger">No account keypair, create one to begin.</IonText>
-      <IonButton strong={true} onClick={() => generateKeyPairB64()}>
+      <IonText class="ion-text-center" color="danger">
+        <p>No account keypair, create one to begin.</p>
+      </IonText>
+      <IonButton
+        expand="full"
+        class="ion-padding ion-no-margin"
+        strong={true}
+        onClick={() => generateKeyPairB64()}
+      >
         Create keypair
       </IonButton>
-      <p>or</p>
+      <IonText class="ion-text-center" color="tertiary">
+        <p>or</p>
+      </IonText>
+
       <ImportKeys importKeyPairB64={importKeyPairB64} />
     </>
   );

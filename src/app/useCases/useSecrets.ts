@@ -70,7 +70,7 @@ export const useSecrets = () => {
     };
 
     if (publickKey !== keyPair?.publicKey) {
-      console.log('publick key does not match secret key');
+      console.log('public key does not match secret key');
     }
 
     localStorage.setItem('default-account', JSON.stringify(keypair));
