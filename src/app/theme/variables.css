@@ -235,7 +235,7 @@ http://ionicframework.com/docs/theming/ */
   }
 }
 
-ion-tab-bar {
-  margin-bottom: var(--ion-safe-area-bottom);
+ion-tab-bar.ios {  
+  padding-bottom: var(--safe-area-inset-bottom, 30px);
 }
 
