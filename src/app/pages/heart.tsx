@@ -1,4 +1,4 @@
-import { IonIcon, useIonActionSheet } from '@ionic/react';
+import { IonIcon, IonText, useIonActionSheet } from '@ionic/react';
 import { PageShell } from '../components/pageShell';
 import { useP2P } from '../useCases/useP2P';
 import { useSecrets } from '../useCases/useSecrets';
@@ -111,12 +111,12 @@ const Heart = () => {
             <>
               <KeyViewer value={publicKey} />
               {pubKeyBalance !== undefined && (
-                <div className="container">
-                  <strong>Balance</strong>
+                <IonText color="primary">
                   <p>
+                    <strong>Balance:</strong>
                     <i>{pubKeyBalance}</i>
                   </p>
-                </div>
+                </IonText>
               )}
               {transactions && transactions.length && (
                 <CrucifixionList

@@ -1,4 +1,3 @@
-import './style.css';
 import {
   IonItem,
   IonLabel,
@@ -7,7 +6,6 @@ import {
   IonCard,
   IonCardContent,
   IonCardHeader,
-  IonCardSubtitle,
   IonCardTitle,
   useIonModal,
   IonText,
