@@ -76,7 +76,7 @@ export const useFieldStore = create<FieldState>()((set, get) => ({
 }));
 
 interface HeartState {
-  blocksByPubKey: { [pubKey: string]: Block[] | null | undefined };
+  transactionsByPubKey: { [pubKey: string]: Transaction[] | null | undefined };
   appendBlocks: (publicKey: string, blocks?: Block[]) => void;
   getTransactions: (pubKey: string) => Transaction[];
   balancesByPubKey: { [pubKey: string]: Balance | null | undefined };
@@ -85,16 +85,24 @@ interface HeartState {
 }
 
 export const useHeartStore = create<HeartState>()((set, get) => ({
-  blocksByPubKey: {},
-  appendBlocks: (publicKey, blocks = []) =>
+  transactionsByPubKey: {},
+  appendBlocks: (publicKey, blocks = []) => {
+    const transactions = blocks.flatMap((i) => i.transactions);
     set((state) => ({
-      blocksByPubKey: {
-        ...state.blocksByPubKey,
-        [publicKey]: [...(state.blocksByPubKey[publicKey] ?? []), ...blocks],
+      transactionsByPubKey: {
+        ...state.transactionsByPubKey,
+        [publicKey]: [
+          ...new Map(
+            [
+              ...(state.transactionsByPubKey[publicKey] ?? []),
+              ...transactions,
+            ].map((item) => [item['time'], item]),
+          ).values(),
+        ],
       },
-    })),
-  getTransactions: (pubKey: string) =>
-    get().blocksByPubKey[pubKey]?.flatMap((b) => b.transactions) ?? [],
+    }));
+  },
+  getTransactions: (pubKey: string) => get().transactionsByPubKey[pubKey] ?? [],
   balancesByPubKey: {},
   getBalance: (pubKey: string) => get().balancesByPubKey[pubKey],
   setBalance: (balance) =>

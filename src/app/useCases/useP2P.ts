@@ -139,7 +139,7 @@ export const useP2P = () => {
           body: {
             public_key: publicKeyB64,
             start_height: tipHeader?.header.height + 1,
-            end_height: 0,
+            end_height: tipHeader?.header.height - 5,
             limit: 10,
           },
         });
