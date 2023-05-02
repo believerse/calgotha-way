@@ -43,6 +43,7 @@ interface FieldState {
   blocksById: { [blockId: string]: Block | null | undefined };
   blockIdsByHeight: { [height: number]: string };
   appendBlock: (block_id: string, block: Block) => void;
+  getBlockIdByHeight: (height: number) => string;
   getTransactions: (height: number) => Transaction[];
   tipHeader?: BlockIdHeaderPair;
   setTipHeader: (tipHeader: BlockIdHeaderPair) => void;
@@ -62,6 +63,10 @@ export const useFieldStore = create<FieldState>()((set, get) => ({
         [block.header.height]: block_id,
       },
     })),
+  getBlockIdByHeight: (height) => {
+    const block_id = get().blockIdsByHeight[height];
+    return block_id;
+  },
   getTransactions: (height) => {
     const block_id = get().blockIdsByHeight[height];
     return get().blocksById[block_id]?.transactions ?? [];

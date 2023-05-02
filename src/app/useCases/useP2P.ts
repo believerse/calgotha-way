@@ -10,7 +10,7 @@ export const useP2P = () => {
   const tipHeader = useFieldStore((state) => state.tipHeader);
   const setTipHeader = useFieldStore((state) => state.setTipHeader);
 
-  const blockIdByHeight = useFieldStore((state) => state.blockIdsByHeight);
+  const getBlockIdByHeight = useFieldStore((state) => state.getBlockIdByHeight);
 
   const fieldTransactions = useFieldStore((state) => state.getTransactions);
   const appendFieldBlock = useFieldStore((state) => state.appendBlock);
@@ -71,13 +71,13 @@ export const useP2P = () => {
 
   const getBlockByHeight = useCallback(
     (height: number) => {
-      if (!!blockIdByHeight[height]) return;
+      if (!!getBlockIdByHeight(height)) return;
       sendJsonMessage({
         type: 'get_block_by_height',
         body: { height },
       });
     },
-    [sendJsonMessage, blockIdByHeight],
+    [sendJsonMessage, getBlockIdByHeight],
   );
 
   const getTipHeader = useCallback(() => {
