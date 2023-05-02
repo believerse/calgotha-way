@@ -1,5 +1,6 @@
-import './style.css';
 import { ReadyState } from 'react-use-websocket';
+import { IonToast } from '@ionic/react';
+import { useEffect, useState } from 'react';
 
 interface ConnectionStatusProps {
   readyState: ReadyState;
@@ -14,14 +15,20 @@ const ConnectionStatus: React.FC<ConnectionStatusProps> = ({ readyState }) => {
     [ReadyState.UNINSTANTIATED]: 'Uninstantiated',
   }[readyState];
 
-  return readyState !== ReadyState.OPEN ? (
-    <div className="connection-status-root">
-      <strong>Not connected</strong>
-      <p>
-        <i>{connectionStatus}</i>
-      </p>
-    </div>
-  ) : null;
+  const [isOpen, setIsOpen] = useState(false);
+
+  useEffect(() => {
+    setIsOpen(readyState !== ReadyState.OPEN);
+  }, [setIsOpen, readyState]);
+
+  return (
+    <IonToast
+      isOpen={isOpen}
+      header="Not connected!"
+      message={connectionStatus}
+      duration={5000}
+    ></IonToast>
+  );
 };
 
 export default ConnectionStatus;
