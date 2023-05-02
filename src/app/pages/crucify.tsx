@@ -57,7 +57,7 @@ const Crucify = () => {
   const [presentToast] = useIonToast();
 
   useEffect(() => {
-    const pushResultHandler = (data: any) =>
+    const pushResultHandler = (data: any) => {
       presentToast({
         message:
           data.detail.error ||
@@ -65,6 +65,12 @@ const Crucify = () => {
         duration: 5000,
         position: 'bottom',
       });
+
+      if (!data.detail.error) {
+        setOffender('');
+        setCharge('');
+      }
+    };
 
     document.addEventListener('push_transaction_result', pushResultHandler);
 
@@ -74,7 +80,7 @@ const Crucify = () => {
         pushResultHandler,
       );
     };
-  }, [presentToast]);
+  }, [presentToast, setOffender, setCharge]);
 
   return (
     <PageShell
