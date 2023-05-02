@@ -118,7 +118,7 @@ const Heart = () => {
                   </p>
                 </IonText>
               )}
-              {transactions && transactions.length && (
+              {!!transactions && !!transactions.length && (
                 <CrucifixionList
                   heading="My Crosses"
                   crucifixions={transactions}
