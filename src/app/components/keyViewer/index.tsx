@@ -1,4 +1,4 @@
-import { IonChip, IonIcon, IonLabel, IonText, useIonModal } from '@ionic/react';
+import { IonChip, IonIcon, useIonModal } from '@ionic/react';
 import { qrCodeOutline, copyOutline } from 'ionicons/icons';
 import QRCode from 'react-qr-code';
 
