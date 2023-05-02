@@ -3,7 +3,7 @@ import { CrucifixionList } from '../components/crucifixion';
 import { PageShell } from '../components/pageShell';
 import { useP2P } from '../useCases/useP2P';
 import { useEffect } from 'react';
-import { IonLabel } from '@ionic/react';
+import { IonButton, IonLabel } from '@ionic/react';
 import { usePagination } from 'react-use-pagination';
 
 const Field = () => {
@@ -41,27 +41,37 @@ const Field = () => {
           <ConnectionStatus readyState={readyState} />
           {!!tipHeight && (
             <>
-              <button onClick={() => setPage(0)} disabled={currentPage === 0}>
+              <IonButton
+                size="small"
+                onClick={() => setPage(0)}
+                disabled={currentPage === 0}
+              >
                 Genesis
-              </button>
-              <button
+              </IonButton>
+              <IonButton
+                size="small"
                 onClick={() => setPreviousPage()}
                 disabled={!previousEnabled}
               >
                 Prev
-              </button>
+              </IonButton>
               <IonLabel>
                 {currentPage + 1} of {totalPages}
               </IonLabel>
-              <button onClick={() => setNextPage()} disabled={!nextEnabled}>
+              <IonButton
+                size="small"
+                onClick={() => setNextPage()}
+                disabled={!nextEnabled}
+              >
                 Next
-              </button>
-              <button
+              </IonButton>
+              <IonButton
+                size="small"
                 onClick={() => setPage(tipHeight + 1)}
                 disabled={currentPage + 1 === tipHeight + 1}
               >
                 Latest
-              </button>
+              </IonButton>
             </>
           )}
           <CrucifixionList crucifixions={fieldTransactions(currentPage)} />

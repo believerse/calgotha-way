@@ -88,7 +88,8 @@ const Crucify = () => {
       renderBody={() => (
         <>
           <ConnectionStatus readyState={readyState} />
-          <button
+          <IonButton
+            size="small"
             onClick={() => {
               presentScanner({
                 onWillDismiss: (ev: CustomEvent<OverlayEventDetail>) => {
@@ -98,7 +99,7 @@ const Crucify = () => {
             }}
           >
             Scan QR Code
-          </button>
+          </IonButton>
           <IonList>
             <IonItem>
               <IonInput
