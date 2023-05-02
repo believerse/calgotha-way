@@ -138,9 +138,9 @@ export const useP2P = () => {
           type: 'get_public_key_transactions',
           body: {
             public_key: publicKeyB64,
-            start_height: tipHeader?.header.height + 1,
+            start_height: tipHeader?.header.height,
             end_height: 0,
-            limit: 10,
+            limit: 100,
           },
         });
       }
