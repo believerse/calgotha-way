@@ -50,6 +50,34 @@ export const useSecrets = () => {
   //TODO: Consider Zustand useState instead
   const [keyPair, setKeyPair] = useState<KeyPairB64>();
 
+  const importKeyPairB64 = (publickKey: string, secretKey: string) => {
+    let secret, error;
+
+    try {
+      secret = nacl.sign.keyPair.fromSecretKey(
+        naclUtil.decodeBase64(secretKey),
+      );
+    } catch (err) {
+      console.log(err);
+      error = err;
+    }
+
+    if (!secret?.publicKey || !secret.secretKey || error) return;
+
+    const keypair = {
+      publicKey: naclUtil.encodeBase64(secret?.publicKey),
+      secretKey: naclUtil.encodeBase64(secret?.secretKey),
+    };
+
+    if (publickKey !== keyPair?.publicKey) {
+      console.log('publick key does not match secret key');
+    }
+
+    localStorage.setItem('default-account', JSON.stringify(keypair));
+
+    loadKeyPair();
+  };
+
   const generateKeyPairB64 = () => {
     const { publicKey, secretKey } = nacl.sign.keyPair();
 
@@ -60,15 +88,22 @@ export const useSecrets = () => {
 
     localStorage.setItem('default-account', JSON.stringify(keypair));
 
-    setKeyPair(keypair);
+    loadKeyPair();
+  };
+
+  const deleteKeyPair = () => {
+    localStorage.removeItem('default-account');
+    setKeyPair(undefined);
   };
 
   const loadKeyPair = useCallback(async () => {
     const value = localStorage.getItem('default-account');
     if (!!value) {
       setKeyPair(JSON.parse(value));
+    } else {
+      setKeyPair(undefined);
     }
-  }, []);
+  }, [setKeyPair]);
 
   useEffect(() => {
     if (!keyPair) {
@@ -79,5 +114,7 @@ export const useSecrets = () => {
   return {
     keyPairB64: keyPair,
     generateKeyPairB64,
+    importKeyPairB64,
+    deleteKeyPair,
   };
 };
