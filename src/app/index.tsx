@@ -11,7 +11,7 @@ import {
 } from '@ionic/react';
 import { IonReactHashRouter } from '@ionic/react-router';
 import { ellipseOutline, squareOutline } from 'ionicons/icons';
-import { FaCross } from 'react-icons/fa';
+import crossSVG from './utils/cross.svg';
 import Crucify from './pages/crucify';
 import Field from './pages/field';
 import Heart from './pages/heart';
@@ -76,7 +76,7 @@ const App: React.FC = () => {
               <IonLabel>Field</IonLabel>
             </IonTabButton>
             <IonTabButton tab="crucify" href="/crucify">
-              <FaCross />
+              <IonIcon aria-hidden="true" src={crossSVG} />
             </IonTabButton>
             <IonTabButton tab="heart" href="/heart">
               <IonIcon aria-hidden="true" icon={ellipseOutline} />
