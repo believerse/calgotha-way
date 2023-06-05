@@ -1,6 +1,6 @@
 import { useCallback } from 'react';
 import useWebSocket from 'react-use-websocket';
-import { PEER_STRING, GENESIS_BLOCK_ID } from '../utils/constants';
+import { NODE_STRING, GENESIS_BLOCK_ID } from '../utils/constants';
 import { useFieldStore, useHeartStore } from './useStore';
 import { signTransaction, useSecrets } from './useSecrets';
 
@@ -21,7 +21,7 @@ export const useP2P = () => {
   const appendHeartBlocks = useHeartStore((state) => state.appendBlocks);
 
   const { sendJsonMessage, readyState } = useWebSocket(
-    `wss://${PEER_STRING}/${GENESIS_BLOCK_ID}`,
+    `wss://${NODE_STRING}/${GENESIS_BLOCK_ID}`,
     {
       protocols: ['cruzbit.1'],
       onOpen: () => console.log('opened'),
@@ -63,6 +63,7 @@ export const useP2P = () => {
   );
 
   const getBlockById = (block_id: string) => {
+    //TODO: skip if exists in cache
     sendJsonMessage({
       type: 'get_block',
       body: { block_id },
@@ -133,6 +134,8 @@ export const useP2P = () => {
     (publicKeyB64: string) => {
       if (!publicKeyB64) throw new Error('missing publicKey');
 
+      //TODO: skip if exists in cache
+
       if (tipHeader?.header.height) {
         sendJsonMessage({
           type: 'get_public_key_transactions',
@@ -150,7 +153,7 @@ export const useP2P = () => {
 
   return {
     readyState,
-    getBlock: getBlockById,
+    getBlockById,
     tipHeader,
     getTipHeader,
     balance,

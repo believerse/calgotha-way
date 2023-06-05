@@ -10,6 +10,7 @@ import { ellipsisHorizontal, ellipsisVertical } from 'ionicons/icons';
 import type { OverlayEventDetail } from '@ionic/core';
 import KeyViewer from '../components/keyViewer';
 import { CreateAccount } from '../components/createAccount';
+import { useIndexer } from '../useCases/useIndexer';
 
 const Heart = () => {
   const { keyPairB64, deleteKeyPair, generateKeyPairB64, importKeyPairB64 } =
@@ -25,6 +26,8 @@ const Heart = () => {
     heartTransactions,
     getHeartTransactions,
   } = useP2P();
+
+  const { getRankFor } = useIndexer();
 
   const transactions = heartTransactions(publicKey);
 
@@ -113,8 +116,18 @@ const Heart = () => {
               {pubKeyBalance !== undefined && (
                 <IonText color="primary">
                   <p>
-                    <strong>Balance:</strong>
+                    <strong>Redemptive surplus: </strong>
                     <i>{pubKeyBalance}</i>
+                  </p>
+                </IonText>
+              )}
+              {getRankFor(publicKey) !== undefined && (
+                <IonText color="primary">
+                  <p>
+                    <strong>Redemptive impact: </strong>
+                    <i>
+                      {Number((getRankFor(publicKey) / 1) * 100).toFixed(2)}%
+                    </i>
                   </p>
                 </IonText>
               )}
