@@ -88,25 +88,63 @@ export const CreateAccount = ({
   importMnemonic: (mnemonicPhrase: string, passPhrase: string) => void;
   exportMnemonic: (mnemonicPhrase: string) => void;
 }) => {
-  const [mnemonicPhrase, setMnemonicPhrase] = useState('');
+  const {
+    value: mnemonicPhrase,
+    isValid: isMnemonicPhraseValid,
+    isTouched: isMnemonicPhraseTouched,
+    onBlur: onBlurMnemonicPhrase,
+    onInputChange: setMnemonicPhrase,
+  } = useInputValidationProps(
+    (mnemonicPhrase: string) =>
+      mnemonicPhrase.split(/(\s)/).filter((x) => x.trim().length > 0).length ===
+      12,
+  );
+
+  const [isImportMode, setIsImportMode] = useState(false);
 
   return (
     <>
-      <IonText class="ion-text-center" color="danger">
-        <p>Create a keychain to begin.</p>
-      </IonText>
-      {!mnemonicPhrase ? (
-        <IonButton
-          expand="full"
-          class="ion-padding ion-no-margin"
-          strong={true}
-          onClick={() => setMnemonicPhrase(generateMnemonic())}
-        >
-          Create keychain
-        </IonButton>
-      ) : (
+      {isImportMode && (
+        <>
+          <IonTextarea
+            className={`${isMnemonicPhraseValid && 'ion-valid'} ${
+              isMnemonicPhraseValid === false && 'ion-invalid'
+            } ${isMnemonicPhraseTouched && 'ion-touched'}`}
+            label="Secret recovery phrase"
+            labelPlacement="stacked"
+            value={mnemonicPhrase}
+            onIonBlur={onBlurMnemonicPhrase}
+            onIonInput={(event) => setMnemonicPhrase(event.target.value ?? '')}
+          />
+          <IonButton
+            expand="full"
+            class="ion-padding ion-no-margin"
+            strong={true}
+            disabled={!isMnemonicPhraseValid}
+            onClick={() => setIsImportMode(false)}
+          >
+            Import keychain
+          </IonButton>
+          <IonButton
+            expand="full"
+            class="ion-padding ion-no-margin"
+            strong={true}
+            onClick={() => setIsImportMode(false)}
+          >
+            Cancel
+          </IonButton>
+        </>
+      )}
+      {!isImportMode && isMnemonicPhraseValid && (
         <>
           <Mnemonics phrase={mnemonicPhrase} exportMnemonic={exportMnemonic} />
+
+          <EnterPassPhrase
+            applyPassPhrase={(passPhrase) =>
+              importMnemonic(mnemonicPhrase, passPhrase)
+            }
+          />
+
           <IonText class="ion-text-center" color="danger">
             <p>Your passphrase is used to secure your keychain.</p>
           </IonText>
@@ -116,11 +154,30 @@ export const CreateAccount = ({
               of 8 characters, a lowercase and an uppercase.
             </p>
           </IonText>
-          <EnterPassPhrase
-            applyPassPhrase={(passPhrase) =>
-              importMnemonic(mnemonicPhrase, passPhrase)
-            }
-          />
+        </>
+      )}
+
+      {!isImportMode && !isMnemonicPhraseValid && (
+        <>
+          <IonButton
+            expand="full"
+            class="ion-padding ion-no-margin"
+            strong={true}
+            onClick={() => setMnemonicPhrase(generateMnemonic())}
+          >
+            Create keychain
+          </IonButton>
+          <IonText class="ion-text-center" color="secondary">
+            <p>or</p>
+          </IonText>
+          <IonButton
+            expand="full"
+            class="ion-padding ion-no-margin"
+            strong={true}
+            onClick={() => setIsImportMode(true)}
+          >
+            Import keychain
+          </IonButton>
         </>
       )}
     </>

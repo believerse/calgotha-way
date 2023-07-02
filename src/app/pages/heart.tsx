@@ -9,7 +9,7 @@ import {
 import { CrucifixionList } from '../components/crucifixion';
 import exportFromJSON from 'export-from-json';
 import { ReadyState } from 'react-use-websocket';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { ellipsisHorizontal, ellipsisVertical } from 'ionicons/icons';
 import type { OverlayEventDetail } from '@ionic/core';
 import KeyViewer from '../components/keyViewer';
