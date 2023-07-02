@@ -2,10 +2,10 @@ import { useCallback } from 'react';
 import useWebSocket from 'react-use-websocket';
 import { NODE_STRING, GENESIS_BLOCK_ID } from '../utils/constants';
 import { useFieldStore, useHeartStore } from './useStore';
-import { signTransaction, useSecrets } from './useSecrets';
+import { signTransaction } from '../utils/keyChain';
 
 export const useP2P = () => {
-  const { keyPairB64 } = useSecrets();
+  const publicKeys = useHeartStore((state) => state.publicKeys);
 
   const tipHeader = useFieldStore((state) => state.tipHeader);
   const setTipHeader = useFieldStore((state) => state.setTipHeader);
@@ -110,13 +110,14 @@ export const useP2P = () => {
     [sendJsonMessage],
   );
 
-  const pushTransaction = (to: string, memo: string) => {
-    if (to && memo && tipHeader?.header.height && keyPairB64) {
+  const pushTransaction = (to: string, memo: string, passphrase: string) => {
+    if (to && memo && tipHeader?.header.height && publicKeys.length) {
       const transaction = signTransaction(
         to,
         memo,
         tipHeader?.header.height,
-        keyPairB64,
+        0,
+        passphrase,
       );
 
       if (!transaction) return;

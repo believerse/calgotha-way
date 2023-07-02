@@ -41,13 +41,21 @@ const Crucify = () => {
     (charge: string) => charge.length > 0 || charge.length <= 140,
   );
 
+  const {
+    value: passphrase,
+    onBlur: onBlurPassphrase,
+    isValid: isPassphraseValid,
+    isTouched: isPassphraseTouched,
+    onInputChange: setPassphrase,
+  } = useInputValidationProps((input: string) => input.length > 0);
+
   const { readyState, pushTransaction } = useP2P();
 
   const execute = () => {
     if (!isOffenderValid || !isChargeValid) {
       return;
     }
-    pushTransaction(offender, charge);
+    pushTransaction(offender, charge, passphrase);
   };
 
   const [presentScanner, dismissScanner] = useIonModal(ScanQR, {
@@ -133,10 +141,28 @@ const Crucify = () => {
                 onIonInput={(event) => setCharge(event.target.value ?? '')}
               />
             </IonItem>
+
+            <IonItem>
+              <IonInput
+                className={`${isPassphraseValid && 'ion-valid'} ${
+                  isPassphraseValid === false && 'ion-invalid'
+                } ${isPassphraseTouched && 'ion-touched'}`}
+                label="Passphrase"
+                labelPlacement="stacked"
+                clearInput={true}
+                errorText="Invalid passphrase"
+                value={passphrase}
+                type="text"
+                onIonBlur={onBlurPassphrase}
+                onIonInput={(event) =>
+                  setPassphrase(event.target.value?.toString() ?? '')
+                }
+              />
+            </IonItem>
           </IonList>
 
           <IonButton
-            disabled={!isOffenderValid || !isChargeValid}
+            disabled={!isOffenderValid || !isChargeValid || !isPassphraseValid}
             expand="full"
             onClick={execute}
             class="ion-padding ion-no-margin"
