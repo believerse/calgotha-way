@@ -2,7 +2,7 @@ import { useCallback } from 'react';
 import useWebSocket from 'react-use-websocket';
 import { NODE_STRING, GENESIS_BLOCK_ID } from '../utils/constants';
 import { useFieldStore, useHeartStore } from './useStore';
-import { signTransaction } from '../utils/keyChain';
+import { signTransaction } from './useKeyChain';
 
 export const useP2P = () => {
   const publicKeys = useHeartStore((state) => state.publicKeys);

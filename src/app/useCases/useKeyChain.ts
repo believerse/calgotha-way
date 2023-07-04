@@ -1,18 +1,14 @@
 import naclUtil from 'tweetnacl-util';
 import nacl from 'tweetnacl';
 import * as bip39 from 'bip39';
-import { Transaction } from '../useCases/useStore';
+import { Transaction, useHeartStore } from './useStore';
 import { sha3_256 } from 'js-sha3';
-import { BLOCKS_UNTIL_NEW_SERIES } from './constants';
-import { decryptData, encryptData } from './encryption';
+import { BLOCKS_UNTIL_NEW_SERIES } from '../utils/constants';
+import { decryptData, encryptData } from '../utils/encryption';
 
 window.Buffer = window.Buffer || require('buffer').Buffer;
 
-export const generateMnemonic = () => {
-  return bip39.generateMnemonic();
-};
-
-export const getKeyChain = async (passphrase: string, count: number) => {
+const getKeyChain = async (passphrase: string, count: number) => {
   const encryptedMnemonic = localStorage.getItem('default-keychain');
 
   if (!encryptedMnemonic) return [];
@@ -82,7 +78,7 @@ export const signTransaction = async (
   return transaction;
 };
 
-export const importMnemonic = async (
+const importMnemonic = async (
   mnemonicPhrase: string,
   passPhrase: string,
   returnKeyCount: number = 3,
@@ -100,6 +96,28 @@ export const importMnemonic = async (
   );
 };
 
-export const deleteKeyChain = () => {
-  localStorage.removeItem('default-keychain');
+export const generateMnemonic = () => {
+  return bip39.generateMnemonic();
+};
+
+export const useKeyChain = () => {
+  const publicKeys = useHeartStore((state) => state.publicKeys);
+  const setPublicKeys = useHeartStore((state) => state.setPublicKeys);
+
+  const importKeyChain = async (mnemonic: string, passphrase: string) => {
+    const keys = await importMnemonic(mnemonic, passphrase, 3);
+
+    setPublicKeys(keys);
+  };
+
+  const deleteKeyChain = () => {
+    localStorage.removeItem('default-keychain');
+    setPublicKeys([]);
+  };
+
+  return {
+    publicKeys,
+    importKeyChain,
+    deleteKeyChain,
+  };
 };

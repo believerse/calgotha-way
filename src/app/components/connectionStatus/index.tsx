@@ -24,7 +24,7 @@ const ConnectionStatus: React.FC<ConnectionStatusProps> = ({ readyState }) => {
   return (
     <IonToast
       isOpen={isOpen}
-      position="top"
+      position="bottom"
       header="Connection status"
       message={connectionStatus}
       duration={5000}

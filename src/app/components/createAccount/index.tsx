@@ -82,11 +82,11 @@ const EnterPassPhrase = ({
 export const CreateAccount = ({
   generateMnemonic,
   importMnemonic,
-  exportMnemonic,
+  copyPhrase,
 }: {
   generateMnemonic: () => string;
   importMnemonic: (mnemonicPhrase: string, passPhrase: string) => void;
-  exportMnemonic: (mnemonicPhrase: string) => void;
+  copyPhrase: (mnemonicPhrase: string) => void;
 }) => {
   const {
     value: mnemonicPhrase,
@@ -137,7 +137,7 @@ export const CreateAccount = ({
       )}
       {!isImportMode && isMnemonicPhraseValid && (
         <>
-          <Mnemonics phrase={mnemonicPhrase} exportMnemonic={exportMnemonic} />
+          <Mnemonics phrase={mnemonicPhrase} copyPhrase={copyPhrase} />
 
           <EnterPassPhrase
             applyPassPhrase={(passPhrase) =>
@@ -186,10 +186,10 @@ export const CreateAccount = ({
 
 const Mnemonics = ({
   phrase,
-  exportMnemonic,
+  copyPhrase,
 }: {
   phrase: string;
-  exportMnemonic: (phrase: string) => void;
+  copyPhrase: (phrase: string) => void;
 }) => {
   return (
     <IonCard>
@@ -202,8 +202,8 @@ const Mnemonics = ({
             <IonChip key={index}>{word}</IonChip>
           ))}
       </IonCardContent>
-      <IonButton fill="clear" onClick={() => exportMnemonic(phrase)}>
-        Export
+      <IonButton fill="clear" onClick={() => copyPhrase(phrase)}>
+        Copy
       </IonButton>
     </IonCard>
   );

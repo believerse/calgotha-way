@@ -1,6 +1,7 @@
 import { IonChip, IonIcon, useIonModal } from '@ionic/react';
 import { qrCodeOutline, copyOutline } from 'ionicons/icons';
 import QRCode from 'react-qr-code';
+import { useClipboard } from '../../useCases/useClipboard';
 
 interface KeyViewerProps {
   value: string;
@@ -39,6 +40,8 @@ const KeyDetails = ({
   onDismiss: () => void;
   value: string;
 }) => {
+  const { copyToClipboard } = useClipboard();
+
   return (
     <>
       <div
@@ -62,7 +65,7 @@ const KeyDetails = ({
           value={value}
           viewBox={`0 0 256 256`}
         />
-        <IonChip onClick={() => navigator.clipboard.writeText(value)}>
+        <IonChip onClick={() => copyToClipboard(value)}>
           <code>
             {value.substring(0, 5)}...{value.substring(40)}
           </code>

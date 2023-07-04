@@ -1,13 +1,8 @@
 import { IonIcon, IonText, useIonActionSheet } from '@ionic/react';
 import { PageShell } from '../components/pageShell';
 import { useP2P } from '../useCases/useP2P';
-import {
-  deleteKeyChain,
-  generateMnemonic,
-  importMnemonic,
-} from '../utils/keyChain';
+import { useKeyChain, generateMnemonic } from '../useCases/useKeyChain';
 import { CrucifixionList } from '../components/crucifixion';
-import exportFromJSON from 'export-from-json';
 import { ReadyState } from 'react-use-websocket';
 import { useEffect } from 'react';
 import { ellipsisHorizontal, ellipsisVertical } from 'ionicons/icons';
@@ -15,17 +10,10 @@ import type { OverlayEventDetail } from '@ionic/core';
 import KeyViewer from '../components/keyViewer';
 import { CreateAccount } from '../components/createAccount';
 import { useIndexer } from '../useCases/useIndexer';
-import { useHeartStore } from '../useCases/useStore';
+import { useClipboard } from '../useCases/useClipboard';
 
 const Heart = () => {
-  const publicKeys = useHeartStore((state) => state.publicKeys);
-  const setPublicKeys = useHeartStore((state) => state.setPublicKeys);
-
-  const importKeyChain = async (mnemonic: string, passphrase: string) => {
-    const keys = await importMnemonic(mnemonic, passphrase, 3);
-
-    setPublicKeys(keys);
-  };
+  const { publicKeys, importKeyChain, deleteKeyChain } = useKeyChain();
 
   const {
     readyState,
@@ -43,13 +31,7 @@ const Heart = () => {
 
   const pubKeyBalance = balance(publicKey)?.balance;
 
-  const exportMnemonic = async (mnemonic: string) => {
-    const data = mnemonic;
-    const fileName = 'export';
-    const exportType = exportFromJSON.types.txt;
-
-    exportFromJSON({ data, fileName, exportType });
-  };
+  const { copyToClipboard } = useClipboard();
 
   useEffect(() => {
     if (readyState === ReadyState.OPEN && publicKey) {
@@ -85,7 +67,7 @@ const Heart = () => {
               header: 'Actions',
               buttons: [
                 {
-                  text: 'Delete keys',
+                  text: 'Delete keychain',
                   role: 'destructive',
                   data: {
                     action: 'delete',
@@ -108,7 +90,7 @@ const Heart = () => {
             <CreateAccount
               generateMnemonic={generateMnemonic}
               importMnemonic={importKeyChain}
-              exportMnemonic={exportMnemonic}
+              copyPhrase={copyToClipboard}
             />
           )}
           {!!publicKey && (
