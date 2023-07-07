@@ -154,22 +154,28 @@ export const CreateAccount = ({
         )}
       {step === 'passphrase' && isSecretPhraseValid && (
         <>
+          {secretPhraseMode === 'create' && (
+            <IonText class="ion-text-center" color="danger">
+              <p>
+                Your passphrase is an extension of your secret phrase and is
+                used to secure your keychain.
+              </p>
+              <p>
+                Your keychain will be lost permanently if you lose or forget it.
+              </p>
+              <p>
+                It must have a minimum of 8 characters, a lowercase and an
+                uppercase letter, a number, and a special character.
+              </p>
+            </IonText>
+          )}
+
           <EnterPassPhrase
             requiresConfirmation={secretPhraseMode === 'create'}
             applyPassPhrase={(passPhrase) =>
               importKeychain(secretPhrase, passPhrase)
             }
           />
-
-          <IonText class="ion-text-center" color="danger">
-            <p>Your passphrase is used to secure your keychain.</p>
-          </IonText>
-          <IonText class="ion-text-center" color="danger">
-            <p>
-              Your passphrase must have a number, a special character, a minimum
-              of 8 characters, a lowercase and an uppercase.
-            </p>
-          </IonText>
         </>
       )}
 
@@ -245,6 +251,12 @@ const SecretPhrase = ({
 
   return isConfirmationMode ? (
     <>
+      <IonText class="ion-text-center" color="danger">
+        <p>
+          Your keychain will be lost permanently if you lose or forget your
+          secret phrase.
+        </p>
+      </IonText>
       <section className="ion-padding">
         {words.map((word, index) => {
           if (randomIndices.has(index)) {
@@ -287,6 +299,13 @@ const SecretPhrase = ({
     </>
   ) : (
     <>
+      <IonText class="ion-text-center" color="danger">
+        <p>
+          This is your secret phrase, it is used to generate a new keychain.
+        </p>
+        <p>You should save it somewhere safe and secure.</p>
+        <p>Your keychain will be lost permanently if you lose or forget it.</p>
+      </IonText>
       <section className="ion-padding">
         {words.map((word, index) => (
           <IonChip key={index}>{word}</IonChip>
