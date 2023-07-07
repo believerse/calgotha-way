@@ -6,6 +6,7 @@ import {
   IonCardHeader,
   IonCardSubtitle,
   IonCardTitle,
+  IonIcon,
   IonInput,
   IonItem,
   IonList,
@@ -13,6 +14,7 @@ import {
   useIonModal,
   useIonToast,
 } from '@ionic/react';
+import { scanOutline } from 'ionicons/icons';
 import type { OverlayEventDetail } from '@ionic/core';
 import { PageShell } from '../components/pageShell';
 import ConnectionStatus from '../components/connectionStatus';
@@ -96,20 +98,8 @@ const Crucify = () => {
       renderBody={() => (
         <>
           <ConnectionStatus readyState={readyState} />
-          <IonButton
-            size="small"
-            onClick={() => {
-              presentScanner({
-                onWillDismiss: (ev: CustomEvent<OverlayEventDetail>) => {
-                  setOffender(ev.detail.data);
-                },
-              });
-            }}
-          >
-            Scan QR Code
-          </IonButton>
           <IonList>
-            <IonItem>
+            <IonItem lines="none">
               <IonInput
                 className={`${isOffenderValid && 'ion-valid'} ${
                   isOffenderValid === false && 'ion-invalid'
@@ -125,9 +115,22 @@ const Crucify = () => {
                   setOffender(event.target.value?.toString() ?? '')
                 }
               />
+              <IonButton
+                fill="clear"
+                slot="end"
+                onClick={() => {
+                  presentScanner({
+                    onWillDismiss: (ev: CustomEvent<OverlayEventDetail>) => {
+                      setOffender(ev.detail.data);
+                    },
+                  });
+                }}
+              >
+                <IonIcon slot="icon-only" icon={scanOutline}></IonIcon>
+              </IonButton>
             </IonItem>
 
-            <IonItem>
+            <IonItem lines="none">
               <IonTextarea
                 className={`${isChargeValid && 'ion-valid'} ${
                   isChargeValid === false && 'ion-invalid'
@@ -142,7 +145,7 @@ const Crucify = () => {
               />
             </IonItem>
 
-            <IonItem>
+            <IonItem lines="none">
               <IonInput
                 className={`${isPassphraseValid && 'ion-valid'} ${
                   isPassphraseValid === false && 'ion-invalid'
@@ -163,9 +166,10 @@ const Crucify = () => {
 
           <IonButton
             disabled={!isOffenderValid || !isChargeValid || !isPassphraseValid}
-            expand="full"
-            onClick={execute}
+            expand="block"
             class="ion-padding ion-no-margin"
+            strong={true}
+            onClick={execute}
           >
             Crucify
           </IonButton>

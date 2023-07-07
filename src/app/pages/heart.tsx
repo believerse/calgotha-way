@@ -95,25 +95,27 @@ const Heart = () => {
           )}
           {!!publicKey && (
             <>
-              <KeyViewer value={publicKey} />
-              {pubKeyBalance !== undefined && (
-                <IonText color="primary">
-                  <p>
-                    <strong>Redemptive surplus: </strong>
-                    <i>{pubKeyBalance}</i>
-                  </p>
-                </IonText>
-              )}
-              {getRankFor(publicKey) !== undefined && (
-                <IonText color="primary">
-                  <p>
-                    <strong>Redemptive impact: </strong>
-                    <i>
-                      {Number((getRankFor(publicKey) / 1) * 100).toFixed(2)}%
-                    </i>
-                  </p>
-                </IonText>
-              )}
+              <section className="ion-padding">
+                <KeyViewer value={publicKey} />
+                {pubKeyBalance !== undefined && (
+                  <IonText color="primary">
+                    <p>
+                      <strong>Redemptive surplus: </strong>
+                      <i>{pubKeyBalance}</i>
+                    </p>
+                  </IonText>
+                )}
+                {getRankFor(publicKey) !== undefined && (
+                  <IonText color="primary">
+                    <p>
+                      <strong>Redemptive impact: </strong>
+                      <i>
+                        {Number((getRankFor(publicKey) / 1) * 100).toFixed(2)}%
+                      </i>
+                    </p>
+                  </IonText>
+                )}
+              </section>
               {!!transactions && !!transactions.length && (
                 <CrucifixionList
                   heading="My Crosses"

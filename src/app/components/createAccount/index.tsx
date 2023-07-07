@@ -77,7 +77,7 @@ const EnterPassPhrase = ({
         onClick={() => applyPassPhrase(passPhrase)}
         class="ion-padding ion-no-margin"
       >
-        Create passphrase
+        {requiresConfirmation ? 'Create passphrase' : 'Apply passphrase'}
       </IonButton>
     </>
   );
@@ -116,16 +116,18 @@ export const CreateAccount = ({
     <>
       {step === 'secretphrase' && secretPhraseMode === 'import' && (
         <>
-          <IonTextarea
-            className={`${isSecretPhraseValid && 'ion-valid'} ${
-              isSecretPhraseValid === false && 'ion-invalid'
-            } ${isSecretPhraseTouched && 'ion-touched'}`}
-            label="Secret recovery phrase"
-            labelPlacement="stacked"
-            value={secretPhrase}
-            onIonBlur={onBlurSecretPhrase}
-            onIonInput={(event) => setSecretPhrase(event.target.value ?? '')}
-          />
+          <IonItem>
+            <IonTextarea
+              className={`${isSecretPhraseValid && 'ion-valid'} ${
+                isSecretPhraseValid === false && 'ion-invalid'
+              } ${isSecretPhraseTouched && 'ion-touched'}`}
+              label="Secret phrase"
+              labelPlacement="stacked"
+              value={secretPhrase}
+              onIonBlur={onBlurSecretPhrase}
+              onIonInput={(event) => setSecretPhrase(event.target.value ?? '')}
+            />
+          </IonItem>
           <IonButton
             expand="block"
             class="ion-padding ion-no-margin"
@@ -243,27 +245,29 @@ const SecretPhrase = ({
 
   return isConfirmationMode ? (
     <>
-      {words.map((word, index) => {
-        if (randomIndices.has(index)) {
-          return (
-            <IonChip key={index} outline={true}>
-              <IonInput
-                style={{ maxWidth: 50 }}
-                aria-label={`${index + 1}`}
-                type="text"
-                onIonInput={(val) =>
-                  setConfirmedWords({
-                    ...confirmedWords,
-                    [index]: val.target.value?.toString() ?? '',
-                  })
-                }
-              />
-            </IonChip>
-          );
-        } else {
-          return <IonChip key={index}>{word}</IonChip>;
-        }
-      })}
+      <section className="ion-padding">
+        {words.map((word, index) => {
+          if (randomIndices.has(index)) {
+            return (
+              <IonChip key={index} outline={true}>
+                <IonInput
+                  style={{ maxWidth: 60 }}
+                  aria-label={`${index + 1}`}
+                  type="text"
+                  onIonInput={(val) =>
+                    setConfirmedWords({
+                      ...confirmedWords,
+                      [index]: val.target.value?.toString() ?? '',
+                    })
+                  }
+                />
+              </IonChip>
+            );
+          } else {
+            return <IonChip key={index}>{word}</IonChip>;
+          }
+        })}
+      </section>
 
       <IonButton
         expand="block"
@@ -283,9 +287,11 @@ const SecretPhrase = ({
     </>
   ) : (
     <>
-      {words.map((word, index) => (
-        <IonChip key={index}>{word}</IonChip>
-      ))}
+      <section className="ion-padding">
+        {words.map((word, index) => (
+          <IonChip key={index}>{word}</IonChip>
+        ))}
+      </section>
 
       <IonButton
         fill="clear"

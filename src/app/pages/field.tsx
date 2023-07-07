@@ -3,7 +3,7 @@ import { CrucifixionList } from '../components/crucifixion';
 import { PageShell } from '../components/pageShell';
 import { useP2P } from '../useCases/useP2P';
 import { useEffect } from 'react';
-import { IonButton, IonLabel } from '@ionic/react';
+import { IonButton, IonItem, IonLabel } from '@ionic/react';
 import { usePagination } from 'react-use-pagination';
 
 const Field = () => {
@@ -40,7 +40,7 @@ const Field = () => {
         <>
           <ConnectionStatus readyState={readyState} />
           {!!tipHeight && (
-            <>
+            <IonItem lines="none" className="ion-justify-content-between">
               <IonButton
                 size="small"
                 onClick={() => setPage(0)}
@@ -55,7 +55,7 @@ const Field = () => {
               >
                 Prev
               </IonButton>
-              <IonLabel>
+              <IonLabel className="ion-text-center">
                 {currentPage + 1} of {totalPages}
               </IonLabel>
               <IonButton
@@ -72,7 +72,7 @@ const Field = () => {
               >
                 Latest
               </IonButton>
-            </>
+            </IonItem>
           )}
           <CrucifixionList crucifixions={fieldTransactions(currentPage)} />
         </>

@@ -29,7 +29,7 @@ export const CrucifixionItem: React.FC<Transaction> = (crucifixion) => {
   const timeMS = time * 1000;
 
   return (
-    <IonItem onClick={() => present()}>
+    <IonItem lines="none" onClick={() => present()}>
       <IonLabel className="ion-text-wrap">
         <KeyViewer value={crucifixion.from} />
         <IonIcon icon={arrowForwardOutline} color="primary"></IonIcon>
