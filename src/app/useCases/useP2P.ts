@@ -1,11 +1,11 @@
 import { useCallback } from 'react';
 import useWebSocket from 'react-use-websocket';
 import { NODE_STRING, GENESIS_BLOCK_ID } from '../utils/constants';
-import { useFieldStore, useHeartStore } from './useStore';
+import { useFieldStore, useHeartStore, useKeyStore } from './useStore';
 import { signTransaction } from './useKeyChain';
 
 export const useP2P = () => {
-  const publicKeys = useHeartStore((state) => state.publicKeys);
+  const publicKeys = useKeyStore((state) => state.publicKeys);
 
   const tipHeader = useFieldStore((state) => state.tipHeader);
   const setTipHeader = useFieldStore((state) => state.setTipHeader);

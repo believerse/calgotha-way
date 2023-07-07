@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { persist, createJSONStorage } from 'zustand/middleware';
 
 export interface Balance {
   public_key: string;
@@ -76,8 +77,6 @@ export const useFieldStore = create<FieldState>()((set, get) => ({
 }));
 
 interface HeartState {
-  publicKeys: string[];
-  setPublicKeys: (keys: string[]) => void;
   transactionsByPubKey: { [pubKey: string]: Transaction[] | null | undefined };
   appendBlocks: (publicKey: string, blocks?: Block[]) => void;
   getTransactions: (pubKey: string) => Transaction[];
@@ -87,12 +86,6 @@ interface HeartState {
 }
 
 export const useHeartStore = create<HeartState>()((set, get) => ({
-  publicKeys: [],
-  setPublicKeys: (keys) => {
-    set(() => ({
-      publicKeys: keys,
-    }));
-  },
   transactionsByPubKey: {},
   appendBlocks: (publicKey, blocks = []) => {
     const transactions = blocks.flatMap((i) => i.transactions);
@@ -121,3 +114,25 @@ export const useHeartStore = create<HeartState>()((set, get) => ({
       },
     })),
 }));
+
+interface KeyState {
+  publicKeys: string[];
+  setPublicKeys: (keys: string[]) => void;
+}
+
+export const useKeyStore = create<KeyState>()(
+  persist(
+    (set, get) => ({
+      publicKeys: [],
+      setPublicKeys: (keys) => {
+        set(() => ({
+          publicKeys: keys,
+        }));
+      },
+    }),
+    {
+      name: 'key-store',
+      storage: createJSONStorage(() => localStorage),
+    },
+  ),
+);

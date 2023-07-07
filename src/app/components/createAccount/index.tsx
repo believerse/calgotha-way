@@ -1,21 +1,21 @@
 import { useState } from 'react';
 import {
+  IonInput,
   IonButton,
   IonItem,
   IonList,
   IonText,
   IonTextarea,
-  IonCard,
-  IonCardContent,
   IonChip,
-  IonCardSubtitle,
 } from '@ionic/react';
 import { useInputValidationProps } from '../../useCases/useInputValidation';
 
 const EnterPassPhrase = ({
   applyPassPhrase,
+  requiresConfirmation,
 }: {
   applyPassPhrase: (phrase: string) => void;
+  requiresConfirmation: boolean;
 }) => {
   const {
     value: passPhrase,
@@ -53,23 +53,27 @@ const EnterPassPhrase = ({
           />
         </IonItem>
 
-        <IonItem>
-          <IonTextarea
-            className={`${isConfirmPhraseValid && 'ion-valid'} ${
-              isConfirmPhraseValid === false && 'ion-invalid'
-            } ${isConfirmPhraseTouched && 'ion-touched'}`}
-            label="Confirm passphrase"
-            labelPlacement="stacked"
-            value={confirmPhrase}
-            onIonBlur={onBlurConfirmPhrase}
-            onIonInput={(event) => setConfirmPhrase(event.target.value ?? '')}
-          />
-        </IonItem>
+        {requiresConfirmation && (
+          <IonItem>
+            <IonTextarea
+              className={`${isConfirmPhraseValid && 'ion-valid'} ${
+                isConfirmPhraseValid === false && 'ion-invalid'
+              } ${isConfirmPhraseTouched && 'ion-touched'}`}
+              label="Confirm passphrase"
+              labelPlacement="stacked"
+              value={confirmPhrase}
+              onIonBlur={onBlurConfirmPhrase}
+              onIonInput={(event) => setConfirmPhrase(event.target.value ?? '')}
+            />
+          </IonItem>
+        )}
       </IonList>
 
       <IonButton
-        disabled={!isPassPhraseValid || !isConfirmPhraseValid}
-        expand="full"
+        disabled={
+          !isPassPhraseValid || (requiresConfirmation && !isConfirmPhraseValid)
+        }
+        expand="block"
         onClick={() => applyPassPhrase(passPhrase)}
         class="ion-padding ion-no-margin"
       >
@@ -80,68 +84,78 @@ const EnterPassPhrase = ({
 };
 
 export const CreateAccount = ({
-  generateMnemonic,
-  importMnemonic,
+  generateSecretPhrase,
+  importKeychain,
   copyPhrase,
 }: {
-  generateMnemonic: () => string;
-  importMnemonic: (mnemonicPhrase: string, passPhrase: string) => void;
-  copyPhrase: (mnemonicPhrase: string) => void;
+  generateSecretPhrase: () => string;
+  importKeychain: (secretPhrase: string, passPhrase: string) => void;
+  copyPhrase: (secretPhrase: string) => void;
 }) => {
   const {
-    value: mnemonicPhrase,
-    isValid: isMnemonicPhraseValid,
-    isTouched: isMnemonicPhraseTouched,
-    onBlur: onBlurMnemonicPhrase,
-    onInputChange: setMnemonicPhrase,
+    value: secretPhrase,
+    isValid: isSecretPhraseValid,
+    isTouched: isSecretPhraseTouched,
+    onBlur: onBlurSecretPhrase,
+    onInputChange: setSecretPhrase,
   } = useInputValidationProps(
-    (mnemonicPhrase: string) =>
-      mnemonicPhrase.split(/(\s)/).filter((x) => x.trim().length > 0).length ===
+    (secretPhrase: string) =>
+      secretPhrase.split(/(\s)/).filter((x) => x.trim().length > 0).length ===
       12,
   );
 
-  const [isImportMode, setIsImportMode] = useState(false);
+  const [secretPhraseMode, setSecretPhraseMode] = useState<'create' | 'import'>(
+    'create',
+  );
+
+  const [step, setStep] = useState<'start' | 'secretphrase' | 'passphrase'>(
+    'start',
+  );
 
   return (
     <>
-      {isImportMode && (
+      {step === 'secretphrase' && secretPhraseMode === 'import' && (
         <>
           <IonTextarea
-            className={`${isMnemonicPhraseValid && 'ion-valid'} ${
-              isMnemonicPhraseValid === false && 'ion-invalid'
-            } ${isMnemonicPhraseTouched && 'ion-touched'}`}
+            className={`${isSecretPhraseValid && 'ion-valid'} ${
+              isSecretPhraseValid === false && 'ion-invalid'
+            } ${isSecretPhraseTouched && 'ion-touched'}`}
             label="Secret recovery phrase"
             labelPlacement="stacked"
-            value={mnemonicPhrase}
-            onIonBlur={onBlurMnemonicPhrase}
-            onIonInput={(event) => setMnemonicPhrase(event.target.value ?? '')}
+            value={secretPhrase}
+            onIonBlur={onBlurSecretPhrase}
+            onIonInput={(event) => setSecretPhrase(event.target.value ?? '')}
           />
           <IonButton
-            expand="full"
+            expand="block"
             class="ion-padding ion-no-margin"
             strong={true}
-            disabled={!isMnemonicPhraseValid}
-            onClick={() => setIsImportMode(false)}
+            disabled={!isSecretPhraseValid}
+            onClick={() => setStep('passphrase')}
           >
-            Import keychain
+            Import
           </IonButton>
-          <IonButton
-            expand="full"
-            class="ion-padding ion-no-margin"
-            strong={true}
-            onClick={() => setIsImportMode(false)}
-          >
-            Cancel
-          </IonButton>
+          <CancelButton action={() => setStep('start')} />
         </>
       )}
-      {!isImportMode && isMnemonicPhraseValid && (
+      {step === 'secretphrase' &&
+        secretPhraseMode === 'create' &&
+        isSecretPhraseValid && (
+          <>
+            <SecretPhrase
+              confirm={() => setStep('passphrase')}
+              cancel={() => setStep('start')}
+              phrase={secretPhrase}
+              copyPhrase={copyPhrase}
+            />
+          </>
+        )}
+      {step === 'passphrase' && isSecretPhraseValid && (
         <>
-          <Mnemonics phrase={mnemonicPhrase} copyPhrase={copyPhrase} />
-
           <EnterPassPhrase
+            requiresConfirmation={secretPhraseMode === 'create'}
             applyPassPhrase={(passPhrase) =>
-              importMnemonic(mnemonicPhrase, passPhrase)
+              importKeychain(secretPhrase, passPhrase)
             }
           />
 
@@ -157,24 +171,31 @@ export const CreateAccount = ({
         </>
       )}
 
-      {!isImportMode && !isMnemonicPhraseValid && (
+      {step === 'start' && (
         <>
           <IonButton
-            expand="full"
+            expand="block"
             class="ion-padding ion-no-margin"
             strong={true}
-            onClick={() => setMnemonicPhrase(generateMnemonic())}
+            onClick={() => {
+              setSecretPhrase(generateSecretPhrase());
+              setStep('secretphrase');
+              setSecretPhraseMode('create');
+            }}
           >
             Create keychain
           </IonButton>
-          <IonText class="ion-text-center" color="secondary">
+          <IonText class="ion-text-center" color="medium">
             <p>or</p>
           </IonText>
           <IonButton
-            expand="full"
+            expand="block"
             class="ion-padding ion-no-margin"
             strong={true}
-            onClick={() => setIsImportMode(true)}
+            onClick={() => {
+              setStep('secretphrase');
+              setSecretPhraseMode('import');
+            }}
           >
             Import keychain
           </IonButton>
@@ -184,27 +205,118 @@ export const CreateAccount = ({
   );
 };
 
-const Mnemonics = ({
+const getRandomRange = (max: number, count: number) => {
+  const set = new Set<number>();
+
+  do {
+    set.add(Math.floor(Math.random() * max));
+  } while (set.size < count);
+
+  return set;
+};
+
+const randomIndices = getRandomRange(12, 3);
+
+const SecretPhrase = ({
   phrase,
   copyPhrase,
+  confirm,
+  cancel,
 }: {
   phrase: string;
   copyPhrase: (phrase: string) => void;
+  confirm: () => void;
+  cancel: () => void;
 }) => {
-  return (
-    <IonCard>
-      <IonCardSubtitle>Secret Recovery Phrase</IonCardSubtitle>
-      <IonCardContent>
-        {phrase
-          .split(/(\s)/)
-          .filter((x) => x.trim().length > 0)
-          .map((word, index) => (
-            <IonChip key={index}>{word}</IonChip>
-          ))}
-      </IonCardContent>
-      <IonButton fill="clear" onClick={() => copyPhrase(phrase)}>
+  const words = phrase.split(/(\s)/).filter((x) => x.trim().length > 0);
+
+  const [isConfirmationMode, setIsConfirmationMode] = useState(false);
+
+  const [confirmedWords, setConfirmedWords] = useState<{
+    [key: number]: string;
+  }>([...randomIndices].reduce((acc, cur) => ({ ...acc, [cur]: '' }), {}));
+
+  const isConfirmationValid = () =>
+    Object.entries(confirmedWords).every(
+      ([index, word]) => words[Number(index)] === word,
+    );
+
+  return isConfirmationMode ? (
+    <>
+      {words.map((word, index) => {
+        if (randomIndices.has(index)) {
+          return (
+            <IonChip key={index} outline={true}>
+              <IonInput
+                style={{ maxWidth: 50 }}
+                aria-label={`${index + 1}`}
+                type="text"
+                onIonInput={(val) =>
+                  setConfirmedWords({
+                    ...confirmedWords,
+                    [index]: val.target.value?.toString() ?? '',
+                  })
+                }
+              />
+            </IonChip>
+          );
+        } else {
+          return <IonChip key={index}>{word}</IonChip>;
+        }
+      })}
+
+      <IonButton
+        expand="block"
+        class="ion-padding ion-no-margin"
+        strong={true}
+        disabled={!isConfirmationValid()}
+        onClick={() => {
+          if (isConfirmationValid()) {
+            confirm();
+          }
+        }}
+      >
+        Confirm
+      </IonButton>
+
+      <CancelButton action={() => setIsConfirmationMode(false)} />
+    </>
+  ) : (
+    <>
+      {words.map((word, index) => (
+        <IonChip key={index}>{word}</IonChip>
+      ))}
+
+      <IonButton
+        fill="clear"
+        expand="block"
+        class="ion-padding ion-no-margin"
+        strong={true}
+        onClick={() => copyPhrase(phrase)}
+      >
         Copy
       </IonButton>
-    </IonCard>
+      <IonButton
+        expand="block"
+        class="ion-padding ion-no-margin"
+        strong={true}
+        onClick={() => setIsConfirmationMode(true)}
+      >
+        Next
+      </IonButton>
+      <CancelButton action={cancel} />
+    </>
   );
 };
+
+const CancelButton = ({ action }: { action: () => void }) => (
+  <IonButton
+    fill="outline"
+    expand="block"
+    className="ion-padding ion-no-margin"
+    strong={true}
+    onClick={action}
+  >
+    Cancel
+  </IonButton>
+);

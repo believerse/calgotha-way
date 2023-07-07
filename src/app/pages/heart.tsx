@@ -1,7 +1,7 @@
 import { IonIcon, IonText, useIonActionSheet } from '@ionic/react';
 import { PageShell } from '../components/pageShell';
 import { useP2P } from '../useCases/useP2P';
-import { useKeyChain, generateMnemonic } from '../useCases/useKeyChain';
+import { useKeyChain, generateSecretPhrase } from '../useCases/useKeyChain';
 import { CrucifixionList } from '../components/crucifixion';
 import { ReadyState } from 'react-use-websocket';
 import { useEffect } from 'react';
@@ -88,8 +88,8 @@ const Heart = () => {
         <>
           {!publicKey && (
             <CreateAccount
-              generateMnemonic={generateMnemonic}
-              importMnemonic={importKeyChain}
+              generateSecretPhrase={generateSecretPhrase}
+              importKeychain={importKeyChain}
               copyPhrase={copyToClipboard}
             />
           )}

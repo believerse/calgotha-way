@@ -1,7 +1,7 @@
 import naclUtil from 'tweetnacl-util';
 import nacl from 'tweetnacl';
 import * as bip39 from 'bip39';
-import { Transaction, useHeartStore } from './useStore';
+import { Transaction, useKeyStore } from './useStore';
 import { sha3_256 } from 'js-sha3';
 import { BLOCKS_UNTIL_NEW_SERIES } from '../utils/constants';
 import { decryptData, encryptData } from '../utils/encryption';
@@ -9,23 +9,25 @@ import { decryptData, encryptData } from '../utils/encryption';
 window.Buffer = window.Buffer || require('buffer').Buffer;
 
 const getKeyChain = async (passphrase: string, count: number) => {
-  const encryptedMnemonic = localStorage.getItem('default-keychain');
+  const encryptedSecretPhrase = localStorage.getItem('default-keychain');
 
-  if (!encryptedMnemonic) return [];
+  if (!encryptedSecretPhrase) return [];
 
-  const decryptedMnemonicBytes = await decryptData(
-    encryptedMnemonic,
+  const decryptedSecretPhraseBytes = await decryptData(
+    encryptedSecretPhrase,
     passphrase,
   );
 
-  if (!decryptedMnemonicBytes) {
-    console.log('Failed to decrypt the mnemonic.');
+  if (!decryptedSecretPhraseBytes) {
+    console.log('Failed to decrypt the secretPhrase.');
     return [];
   }
 
-  const decryptedMnemonic = new TextDecoder().decode(decryptedMnemonicBytes);
+  const decryptedSecretPhrase = new TextDecoder().decode(
+    decryptedSecretPhraseBytes,
+  );
 
-  const seed = bip39.mnemonicToSeedSync(decryptedMnemonic, passphrase);
+  const seed = bip39.mnemonicToSeedSync(decryptedSecretPhrase, passphrase);
   const keypairs = [];
 
   for (let i = 0; i < count; i++) {
@@ -78,34 +80,34 @@ export const signTransaction = async (
   return transaction;
 };
 
-const importMnemonic = async (
-  mnemonicPhrase: string,
+const importSecretPhrase = async (
+  secretPhrasePhrase: string,
   passPhrase: string,
-  returnKeyCount: number = 3,
+  returnedKeyCount: number = 3,
 ) => {
-  const encryptedMnemonic = await encryptData(
-    new TextEncoder().encode(mnemonicPhrase.trim()),
+  const encryptedSecretPhrase = await encryptData(
+    new TextEncoder().encode(secretPhrasePhrase.trim()),
     passPhrase,
   );
-  localStorage.setItem('default-keychain', encryptedMnemonic);
+  localStorage.setItem('default-keychain', encryptedSecretPhrase);
 
   //We can keep the public keys in state
   //But we never persist the passphrase or private keys in state or anywhere else.
-  return (await getKeyChain(passPhrase, returnKeyCount)).map(
+  return (await getKeyChain(passPhrase, returnedKeyCount)).map(
     (keypair) => keypair.publicKey,
   );
 };
 
-export const generateMnemonic = () => {
+export const generateSecretPhrase = () => {
   return bip39.generateMnemonic();
 };
 
 export const useKeyChain = () => {
-  const publicKeys = useHeartStore((state) => state.publicKeys);
-  const setPublicKeys = useHeartStore((state) => state.setPublicKeys);
+  const publicKeys = useKeyStore((state) => state.publicKeys);
+  const setPublicKeys = useKeyStore((state) => state.setPublicKeys);
 
-  const importKeyChain = async (mnemonic: string, passphrase: string) => {
-    const keys = await importMnemonic(mnemonic, passphrase, 3);
+  const importKeyChain = async (secretPhrase: string, passphrase: string) => {
+    const keys = await importSecretPhrase(secretPhrase, passphrase, 3);
 
     setPublicKeys(keys);
   };
