@@ -104,7 +104,7 @@ const Crucify = () => {
                 className={`${isOffenderValid && 'ion-valid'} ${
                   isOffenderValid === false && 'ion-invalid'
                 } ${isOffenderTouched && 'ion-touched'}`}
-                label="Cross bearer / Offender"
+                label="Cross bearer"
                 labelPlacement="stacked"
                 clearInput={true}
                 errorText="Invalid public key"
@@ -135,7 +135,7 @@ const Crucify = () => {
                 className={`${isChargeValid && 'ion-valid'} ${
                   isChargeValid === false && 'ion-invalid'
                 } ${isChargeTouched && 'ion-touched'}`}
-                label="Head sign / Charge"
+                label="Charge"
                 labelPlacement="stacked"
                 counter={true}
                 maxlength={140}

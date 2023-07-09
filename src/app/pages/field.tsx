@@ -1,4 +1,3 @@
-import ConnectionStatus from '../components/connectionStatus';
 import { CrucifixionList } from '../components/crucifixion';
 import { PageShell } from '../components/pageShell';
 import { useP2P } from '../useCases/useP2P';
@@ -38,7 +37,6 @@ const Field = () => {
       title="Field"
       renderBody={() => (
         <>
-          <ConnectionStatus readyState={readyState} />
           {!!tipHeight && (
             <IonItem lines="none" className="ion-justify-content-between">
               <IonButton
