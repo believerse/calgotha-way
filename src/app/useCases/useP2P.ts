@@ -110,9 +110,13 @@ export const useP2P = () => {
     [sendJsonMessage],
   );
 
-  const pushTransaction = (to: string, memo: string, passphrase: string) => {
+  const pushTransaction = async (
+    to: string,
+    memo: string,
+    passphrase: string,
+  ) => {
     if (to && memo && tipHeader?.header.height && publicKeys.length) {
-      const transaction = signTransaction(
+      const transaction = await signTransaction(
         to,
         memo,
         tipHeader?.header.height,
