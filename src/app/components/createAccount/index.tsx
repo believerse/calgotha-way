@@ -41,29 +41,35 @@ const EnterPassPhrase = ({
     <>
       <IonList>
         <IonItem>
-          <IonTextarea
+          <IonInput
             className={`${isPassPhraseValid && 'ion-valid'} ${
               isPassPhraseValid === false && 'ion-invalid'
             } ${isPassPhraseTouched && 'ion-touched'}`}
             label="Passphrase"
             labelPlacement="stacked"
+            type="password"
             value={passPhrase}
             onIonBlur={onBlurPassPhrase}
-            onIonInput={(event) => setPassPhrase(event.target.value ?? '')}
+            onIonInput={(event) =>
+              setPassPhrase(event.target.value?.toString() ?? '')
+            }
           />
         </IonItem>
 
         {requiresConfirmation && (
           <IonItem>
-            <IonTextarea
+            <IonInput
               className={`${isConfirmPhraseValid && 'ion-valid'} ${
                 isConfirmPhraseValid === false && 'ion-invalid'
               } ${isConfirmPhraseTouched && 'ion-touched'}`}
               label="Confirm passphrase"
               labelPlacement="stacked"
+              type="password"
               value={confirmPhrase}
               onIonBlur={onBlurConfirmPhrase}
-              onIonInput={(event) => setConfirmPhrase(event.target.value ?? '')}
+              onIonInput={(event) =>
+                setConfirmPhrase(event.target.value?.toString() ?? '')
+              }
             />
           </IonItem>
         )}
