@@ -9,6 +9,7 @@ import {
   IonIcon,
   IonInput,
   IonItem,
+  IonLabel,
   IonList,
   IonTextarea,
   useIonModal,
@@ -20,16 +21,17 @@ import { PageShell } from '../components/pageShell';
 import { Html5QrcodePlugin } from '../utils/qr-scanner';
 import { useP2P } from '../useCases/useP2P';
 import { useInputValidationProps } from '../useCases/useInputValidation';
+import KeyViewer from '../components/keyViewer';
 
 const Crucify = () => {
   const {
-    value: offender,
-    onBlur: onBlurOffender,
-    isValid: isOffenderValid,
-    isTouched: isOffenderTouched,
-    onInputChange: setOffender,
-  } = useInputValidationProps((offender: string) =>
-    new RegExp('[A-Za-z0-9/+]{43}=').test(offender),
+    value: crossBearer,
+    onBlur: onBlurCrossBearer,
+    isValid: isCrossBearerValid,
+    isTouched: isCrossBearerTouched,
+    onInputChange: setCrossBearer,
+  } = useInputValidationProps((crossBearer: string) =>
+    new RegExp('[A-Za-z0-9/+]{43}=').test(crossBearer),
   );
 
   const {
@@ -42,21 +44,13 @@ const Crucify = () => {
     (charge: string) => charge.length > 0 || charge.length <= 140,
   );
 
-  const {
-    value: passphrase,
-    onBlur: onBlurPassphrase,
-    isValid: isPassphraseValid,
-    isTouched: isPassphraseTouched,
-    onInputChange: setPassphrase,
-  } = useInputValidationProps((input: string) => input.length > 0);
-
   const { readyState, pushTransaction } = useP2P();
 
-  const execute = () => {
-    if (!isOffenderValid || !isChargeValid) {
+  const execute = (passphrase: string) => {
+    if (!isCrossBearerValid || !isChargeValid) {
       return;
     }
-    pushTransaction(offender, charge, passphrase);
+    pushTransaction(crossBearer, charge, passphrase);
   };
 
   const [presentScanner, dismissScanner] = useIonModal(ScanQR, {
@@ -64,6 +58,16 @@ const Crucify = () => {
   });
 
   const [presentToast] = useIonToast();
+
+  const [presentModal, dismiss] = useIonModal(AuthorizeTransaction, {
+    onDismiss: () => dismiss(),
+    onAuthorize: (passphrase: string) => {
+      execute(passphrase);
+      dismiss();
+    },
+    crossBearer,
+    charge,
+  });
 
   useEffect(() => {
     const pushResultHandler = (data: any) => {
@@ -76,7 +80,7 @@ const Crucify = () => {
       });
 
       if (!data.detail.error) {
-        setOffender('');
+        setCrossBearer('');
         setCharge('');
       }
     };
@@ -89,7 +93,7 @@ const Crucify = () => {
         pushResultHandler,
       );
     };
-  }, [presentToast, setOffender, setCharge]);
+  }, [presentToast, setCrossBearer, setCharge]);
 
   return (
     <PageShell
@@ -99,17 +103,17 @@ const Crucify = () => {
           <IonList>
             <IonItem lines="none">
               <IonTextarea
-                className={`${isOffenderValid && 'ion-valid'} ${
-                  isOffenderValid === false && 'ion-invalid'
-                } ${isOffenderTouched && 'ion-touched'}`}
+                className={`${isCrossBearerValid && 'ion-valid'} ${
+                  isCrossBearerValid === false && 'ion-invalid'
+                } ${isCrossBearerTouched && 'ion-touched'}`}
                 label="Cross bearer"
                 labelPlacement="stacked"
                 clearOnEdit={true}
                 errorText="Invalid public key"
-                value={offender}
-                onIonBlur={onBlurOffender}
+                value={crossBearer}
+                onIonBlur={onBlurCrossBearer}
                 onIonInput={(event) =>
-                  setOffender(event.target.value?.toString() ?? '')
+                  setCrossBearer(event.target.value?.toString() ?? '')
                 }
               />
               <IonButton
@@ -118,7 +122,7 @@ const Crucify = () => {
                 onClick={() => {
                   presentScanner({
                     onWillDismiss: (ev: CustomEvent<OverlayEventDetail>) => {
-                      setOffender(ev.detail.data);
+                      setCrossBearer(ev.detail.data);
                     },
                   });
                 }}
@@ -141,32 +145,19 @@ const Crucify = () => {
                 onIonInput={(event) => setCharge(event.target.value ?? '')}
               />
             </IonItem>
-
-            <IonItem lines="none">
-              <IonInput
-                className={`${isPassphraseValid && 'ion-valid'} ${
-                  isPassphraseValid === false && 'ion-invalid'
-                } ${isPassphraseTouched && 'ion-touched'}`}
-                label="Passphrase"
-                labelPlacement="stacked"
-                clearInput={true}
-                errorText="Invalid passphrase"
-                value={passphrase}
-                type="text"
-                onIonBlur={onBlurPassphrase}
-                onIonInput={(event) =>
-                  setPassphrase(event.target.value?.toString() ?? '')
-                }
-              />
-            </IonItem>
           </IonList>
 
           <IonButton
-            disabled={!isOffenderValid || !isChargeValid || !isPassphraseValid}
+            disabled={!isCrossBearerValid || !isChargeValid}
             expand="block"
             class="ion-padding ion-no-margin"
             strong={true}
-            onClick={execute}
+            onClick={() =>
+              presentModal({
+                initialBreakpoint: 0.75,
+                breakpoints: [0, 0.75],
+              })
+            }
           >
             Crucify
           </IonButton>
@@ -207,5 +198,82 @@ export const ScanQR = ({
         </IonCard>
       )}
     />
+  );
+};
+
+const AuthorizeTransaction = ({
+  onDismiss,
+  onAuthorize,
+  crossBearer,
+  charge,
+}: {
+  onDismiss: () => void;
+  onAuthorize: (passphrase: string) => void;
+  crossBearer: string;
+  charge: string;
+}) => {
+  const {
+    value: passphrase,
+    onBlur: onBlurPassphrase,
+    isValid: isPassphraseValid,
+    isTouched: isPassphraseTouched,
+    onInputChange: setPassphrase,
+  } = useInputValidationProps((input: string) => input.length > 0);
+
+  return (
+    <div>
+      <IonCard>
+        <IonCardHeader>
+          <IonCardTitle>Authorize crucifixion</IonCardTitle>
+          <IonCardSubtitle>Do you want to proceed?</IonCardSubtitle>
+        </IonCardHeader>
+        <IonCardContent>
+          <IonList>
+            <IonItem lines="none">
+              <KeyViewer value={crossBearer} />
+            </IonItem>
+            <IonItem lines="none">
+              <IonLabel>{charge}</IonLabel>
+            </IonItem>
+          </IonList>
+        </IonCardContent>
+      </IonCard>
+      <IonCard>
+        <IonItem lines="none">
+          <IonInput
+            className={`${isPassphraseValid && 'ion-valid'} ${
+              isPassphraseValid === false && 'ion-invalid'
+            } ${isPassphraseTouched && 'ion-touched'}`}
+            label="Enter Passphrase"
+            labelPlacement="stacked"
+            clearInput={true}
+            errorText="Invalid passphrase"
+            value={passphrase}
+            type="password"
+            onIonBlur={onBlurPassphrase}
+            onIonInput={(event) =>
+              setPassphrase(event.target.value?.toString() ?? '')
+            }
+          />
+        </IonItem>
+        <IonButton
+          fill="solid"
+          expand="block"
+          strong={true}
+          disabled={!isPassphraseValid}
+          onClick={() => onAuthorize(passphrase)}
+        >
+          Authorize
+        </IonButton>
+        <IonButton
+          fill="outline"
+          expand="block"
+          strong={true}
+          onClick={() => onDismiss()}
+        >
+          Cancel
+        </IonButton>
+      </IonCard>
+    </div>
   );
 };
