@@ -17,7 +17,6 @@ import {
 import { scanOutline } from 'ionicons/icons';
 import type { OverlayEventDetail } from '@ionic/core';
 import { PageShell } from '../components/pageShell';
-import ConnectionStatus from '../components/connectionStatus';
 import { Html5QrcodePlugin } from '../utils/qr-scanner';
 import { useP2P } from '../useCases/useP2P';
 import { useInputValidationProps } from '../useCases/useInputValidation';
@@ -97,19 +96,17 @@ const Crucify = () => {
       title="Crucify"
       renderBody={() => (
         <>
-          <ConnectionStatus readyState={readyState} />
           <IonList>
             <IonItem lines="none">
-              <IonInput
+              <IonTextarea
                 className={`${isOffenderValid && 'ion-valid'} ${
                   isOffenderValid === false && 'ion-invalid'
                 } ${isOffenderTouched && 'ion-touched'}`}
                 label="Cross bearer"
                 labelPlacement="stacked"
-                clearInput={true}
+                clearOnEdit={true}
                 errorText="Invalid public key"
                 value={offender}
-                type="text"
                 onIonBlur={onBlurOffender}
                 onIonInput={(event) =>
                   setOffender(event.target.value?.toString() ?? '')
